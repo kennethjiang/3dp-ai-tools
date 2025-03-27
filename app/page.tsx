@@ -501,7 +501,7 @@ export default function Home() {
             <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="analysis" className="flex items-center gap-1">
                 <BarChart className="h-4 w-4" />
-                <span>Analysis Results</span>
+                <span>AI Analysis</span>
               </TabsTrigger>
               <TabsTrigger value="settings" className="flex items-center gap-1">
                 <Settings className="h-4 w-4" />
@@ -509,11 +509,11 @@ export default function Home() {
               </TabsTrigger>
               <TabsTrigger value="filament" className="flex items-center gap-1">
                 <Layers className="h-4 w-4" />
-                <span>Filament Info</span>
+                <span>Filament Preset</span>
               </TabsTrigger>
               <TabsTrigger value="print" className="flex items-center gap-1">
                 <Printer className="h-4 w-4" />
-                <span>Print Settings</span>
+                <span>Process Preset</span>
               </TabsTrigger>
               <TabsTrigger value="comparison" className="flex items-center gap-1">
                 <DiffIcon className="h-4 w-4" />
@@ -521,7 +521,7 @@ export default function Home() {
               </TabsTrigger>
               <TabsTrigger value="files" className="flex items-center gap-1">
                 <File className="h-4 w-4" />
-                <span>File Contents</span>
+                <span>Project Contents</span>
               </TabsTrigger>
             </TabsList>
 
