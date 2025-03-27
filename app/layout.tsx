@@ -6,7 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
-  title: "3MF File Analyzer",
+  title: "How Was It Sliced?",
   description: "Analyze 3MF files for 3D printing optimization",
   generator: 'v0.dev',
   icons: {

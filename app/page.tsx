@@ -406,13 +406,12 @@ export default function Home() {
     <main className="container mx-auto py-10 px-4">
       <div className="flex items-center justify-center mb-8">
         <img src="/favicon.svg" alt="3MF Analyzer Logo" className="w-10 h-10 mr-3" />
-        <h1 className="text-3xl font-bold">3MF File Analyzer</h1>
+        <h1 className="text-3xl font-bold">How Was It Sliced?</h1>
       </div>
 
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle>Upload 3MF File</CardTitle>
-          <CardDescription>Upload a 3MF file to analyze its parameters and configuration</CardDescription>
+          <CardDescription>Ever wondered how the original creator of a 3MF file sliced their model? Now you can find out! Just upload the 3MF file and let the AI reveal the secrets.</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit}>
@@ -450,10 +449,10 @@ export default function Home() {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Analyzing...
+                  Take a deep breath...
                 </>
               ) : (
-                "Analyze 3MF File"
+                "AI Lord, Set Me Free!"
               )}
             </Button>
           </form>
@@ -520,9 +519,6 @@ export default function Home() {
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 {/* Sidebar Navigation */}
                 <Card className="md:col-span-1">
-                  <CardHeader className="pb-3">
-                    <CardTitle>Analysis Sections</CardTitle>
-                  </CardHeader>
                   <CardContent className="p-0">
                     <nav className="flex flex-col">
                       <Button
