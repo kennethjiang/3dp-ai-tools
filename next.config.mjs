@@ -21,6 +21,11 @@ const nextConfig = {
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
   },
+  api: {
+    bodyParser: {
+      sizeLimit: '20mb',
+    },
+  },
 }
 
 mergeConfig(nextConfig, userConfig)
