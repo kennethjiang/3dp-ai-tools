@@ -406,7 +406,10 @@ export default function Home() {
 
   return (
     <main className="container mx-auto py-10 px-4">
-      <h1 className="text-3xl font-bold mb-6">3MF File Analyzer</h1>
+      <div className="flex items-center justify-center mb-8">
+        <img src="/favicon.svg" alt="3MF Analyzer Logo" className="w-10 h-10 mr-3" />
+        <h1 className="text-3xl font-bold">3MF File Analyzer</h1>
+      </div>
 
       <Card className="mb-8">
         <CardHeader>
