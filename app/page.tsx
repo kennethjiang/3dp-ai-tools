@@ -420,12 +420,15 @@ export default function Home() {
     <main className="container mx-auto py-10 px-4">
       <div className="flex items-center justify-center mb-8">
         <img src="/favicon.svg" alt="3MF Analyzer Logo" className="w-10 h-10 mr-3" />
-        <h1 className="text-3xl font-bold">How Was It Sliced?</h1>
+        <h1 className="text-3xl font-bold">How was it sliced?</h1>
       </div>
 
       <Card className="mb-8">
         <CardHeader>
-          <CardDescription>Ever wondered how the original creator of a 3MF file sliced their model? Now you can find out! Just upload the 3MF file and let the AI reveal the secrets.</CardDescription>
+          <CardDescription>
+            <p>Ever wondered how the original creator of a 3MF file sliced their model? Now you can find out! Just upload the 3MF file and let the AI reveal the secrets.</p>
+            <i>Currently only supports 3MF files created with Bambu Studio or downloaded from MakerWorld. 3MF files created with PrusaSlicer may not work.</i>
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit}>
@@ -467,7 +470,7 @@ export default function Home() {
                   Take a deep breath...
                 </>
               ) : (
-                "AI Lord, Set Me Free!"
+                "AI lord, set me free!"
               )}
             </Button>
           </form>
