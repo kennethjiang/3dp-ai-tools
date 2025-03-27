@@ -14,6 +14,7 @@ A Next.js web application that analyzes 3D printing files (3MF format) using AI 
   - Trade-offs introduced by the settings
   - Optimization suggestions
   - Detailed parameter-by-parameter analysis
+- Langfuse integration for tracking and monitoring OpenAI API calls
 
 ## Technology Stack
 
@@ -23,6 +24,7 @@ A Next.js web application that analyzes 3D printing files (3MF format) using AI 
 - Tailwind CSS with Shadcn UI components
 - OpenAI API (GPT-4o)
 - JSZip for 3MF file extraction
+- Langfuse for API call tracking
 
 ## Getting Started
 
@@ -31,6 +33,7 @@ A Next.js web application that analyzes 3D printing files (3MF format) using AI 
 - Node.js 18.17.0 or later
 - PNPM package manager
 - OpenAI API key
+- Langfuse account (optional, for API call tracking)
 
 ### Development Setup
 
@@ -45,10 +48,15 @@ A Next.js web application that analyzes 3D printing files (3MF format) using AI 
    pnpm install
    ```
 
-3. Create a `.env.local` file in the project root with your OpenAI API key:
+3. Create a `.env.local` file in the project root with your API keys:
    ```
    OPENAI_API_KEY=your_openai_api_key_here
    VERCEL_URL=localhost:3000
+
+   # Optional: Langfuse configuration for API call tracking
+   LANGFUSE_PUBLIC_KEY=your_public_key_here
+   LANGFUSE_SECRET_KEY=your_secret_key_here
+   LANGFUSE_BASE_URL=https://cloud.langfuse.com
    ```
 
 4. Start the development server:
@@ -75,6 +83,10 @@ A Next.js web application that analyzes 3D printing files (3MF format) using AI 
 3. Add environment variables:
    - In your project settings on Vercel, go to "Environment Variables"
    - Add `OPENAI_API_KEY` with your actual OpenAI API key
+   - Add Langfuse variables if you want to track API calls:
+     - `LANGFUSE_PUBLIC_KEY`
+     - `LANGFUSE_SECRET_KEY`
+     - `LANGFUSE_BASE_URL`
 
 4. Deploy:
    - Click "Deploy" and wait for the build to complete
@@ -98,6 +110,7 @@ A Next.js web application that analyzes 3D printing files (3MF format) using AI 
 - The default model can be changed in `lib/openai.ts`
 - Error handling is implemented for various failure scenarios
 - For local development without an OpenAI API key, you can use the test endpoint at `/test-openai`
+- API calls are tracked using Langfuse when configured (optional)
 
 ## License
 

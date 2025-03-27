@@ -2,6 +2,7 @@ import { OpenAI } from "openai"
 import { z } from "zod"
 import { zodToJsonSchema } from "zod-to-json-schema"
 import type { AnalysisResults } from "@/types/analysis"
+import { createTrace, createSpan } from "./langfuse"
 
 // Define structured output models using Zod
 const ParameterEffect = z.object({
@@ -59,43 +60,72 @@ async function getStructuredAnalysisFromOpenAI(
     dangerouslyAllowBrowser: true, // Added to allow browser usage
   })
 
-  // Create JSON schema from Zod schema
-  const schema = zodToJsonSchema(SlicingProfileAnalysis)
+  // Create a new trace for this analysis
+  const trace = await createTrace()
+  const span = await createSpan(trace.id, 'OpenAI Analysis')
 
-  // Call OpenAI with function calling
-  const response = await openai.chat.completions.create({
-    model,
-    temperature,
-    messages: [
-      {
-        role: "system",
-        content:
-          "You are an expert 3D printing consultant specializing in slicing profiles and parameter optimization.",
-      },
-      {
-        role: "user",
-        content: `Analyze the following 3D printing slicing profile and explain the likely intentions of the creator based on the parameter modifications:\n\n${profileDescription}`,
-      },
-    ],
-    functions: [
-      {
-        name: "analyzeSlicingProfile",
-        description: "Analyze a 3D printing slicing profile",
-        parameters: schema,
-      },
-    ],
-    function_call: { name: "analyzeSlicingProfile" },
-  })
+  try {
+    // Create JSON schema from Zod schema
+    const schema = zodToJsonSchema(SlicingProfileAnalysis)
 
-  // Parse the response
-  const functionCall = response.choices[0]?.message?.function_call
-  if (!functionCall || !functionCall.arguments) {
-    throw new Error("No function call in response")
+    // Call OpenAI with function calling
+    const response = await openai.chat.completions.create({
+      model,
+      temperature,
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are an expert 3D printing consultant specializing in slicing profiles and parameter optimization.",
+        },
+        {
+          role: "user",
+          content: `Analyze the following 3D printing slicing profile and explain the likely intentions of the creator based on the parameter modifications:\n\n${profileDescription}`,
+        },
+      ],
+      functions: [
+        {
+          name: "analyzeSlicingProfile",
+          description: "Analyze a 3D printing slicing profile",
+          parameters: schema,
+        },
+      ],
+      function_call: { name: "analyzeSlicingProfile" },
+    })
+
+    // Log the completion to Langfuse
+    await span.update({
+      input: {
+        profileDescription,
+        model,
+        temperature,
+      },
+      output: response.choices[0]?.message?.content,
+      metadata: {
+        model,
+        temperature,
+        totalTokens: response.usage?.total_tokens,
+        promptTokens: response.usage?.prompt_tokens,
+        completionTokens: response.usage?.completion_tokens,
+      },
+    })
+
+    // Parse the response
+    const functionCall = response.choices[0]?.message?.function_call
+    if (!functionCall || !functionCall.arguments) {
+      throw new Error("No function call in response")
+    }
+
+    // Parse and validate with Zod
+    const parsedArgs = JSON.parse(functionCall.arguments)
+    return SlicingProfileAnalysis.parse(parsedArgs)
+  } catch (error) {
+    // Log the error to Langfuse
+    await span.update({
+      error: error instanceof Error ? error.message : String(error),
+    })
+    throw error
   }
-
-  // Parse and validate with Zod
-  const parsedArgs = JSON.parse(functionCall.arguments)
-  return SlicingProfileAnalysis.parse(parsedArgs)
 }
 
 // This function will be called from server components or API routes only
