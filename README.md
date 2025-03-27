@@ -4,7 +4,7 @@ A Next.js web application that analyzes 3D printing files (3MF format) using AI 
 
 ## Features
 
-- Upload and analyze 3MF files from PrusaSlicer and compatible slicers
+- Upload and analyze 3MF files from PrusaSlicer and compatible slicers (up to 4.5MB)
 - Extract and view all files contained within the 3MF archive
 - AI-powered analysis of slicer settings using OpenAI's GPT-4o
 - Compare modified settings against standard profiles
@@ -96,7 +96,7 @@ A Next.js web application that analyzes 3D printing files (3MF format) using AI 
 ## Usage
 
 1. Open the application in your web browser.
-2. Upload a 3MF file using the drag-and-drop area or the file browser.
+2. Upload a 3MF file using the drag-and-drop area or the file browser (max 4.5MB).
 3. Wait for the analysis to complete.
 4. Explore the results across different tabs:
    - Overview: General information about the print settings
@@ -111,6 +111,7 @@ A Next.js web application that analyzes 3D printing files (3MF format) using AI 
 - Error handling is implemented for various failure scenarios
 - For local development without an OpenAI API key, you can use the test endpoint at `/test-openai`
 - API calls are tracked using Langfuse when configured (optional)
+- File upload size is limited to 4.5MB to comply with Vercel's free tier limits
 
 ## License
 

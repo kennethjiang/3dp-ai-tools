@@ -16,10 +16,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "File must be a .3mf file" }, { status: 400 })
     }
 
-    // Check file size (20MB limit)
-    const MAX_FILE_SIZE = 20 * 1024 * 1024 // 20MB
+    // Check file size (4.5MB limit)
+    const MAX_FILE_SIZE = 4.5 * 1024 * 1024 // 4.5MB
     if (file.size > MAX_FILE_SIZE) {
-      return NextResponse.json({ error: "File size exceeds 20MB limit" }, { status: 400 })
+      return NextResponse.json({ error: "File size exceeds 4.5MB limit" }, { status: 400 })
     }
 
     console.log(`Processing file: ${file.name}, size: ${file.size} bytes`)

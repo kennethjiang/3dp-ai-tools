@@ -237,9 +237,9 @@ export default function Home() {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0]
       // Check file size (20MB limit)
-      if (selectedFile.size > 20 * 1024 * 1024) {
+      if (selectedFile.size > 4.5 * 1024 * 1024) {
         setFile(null)
-        setError("File size exceeds 20MB limit. Please select a smaller file.")
+        setError("File size exceeds 4.5MB limit. Please select a smaller file.")
         return
       }
 
@@ -271,9 +271,9 @@ export default function Home() {
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const droppedFile = e.dataTransfer.files[0]
       // Check file size (20MB limit)
-      if (droppedFile.size > 20 * 1024 * 1024) {
+      if (droppedFile.size > 4.5 * 1024 * 1024) {
         setFile(null)
-        setError("File size exceeds 20MB limit. Please select a smaller file.")
+        setError("File size exceeds 4.5MB limit. Please select a smaller file.")
         return
       }
 
@@ -469,7 +469,7 @@ export default function Home() {
                   <Upload className="h-10 w-10 text-muted-foreground mb-2" />
                   <p className="text-sm font-medium">Drag and drop your 3MF file here</p>
                   <p className="text-xs text-muted-foreground mt-1">or click to browse</p>
-                  <p className="text-xs text-muted-foreground mt-2">Maximum file size: 20MB</p>
+                  <p className="text-xs text-muted-foreground mt-2">Maximum file size: 4.5MB</p>
                 </div>
               )}
             </div>
@@ -494,7 +494,7 @@ export default function Home() {
           message={error}
           type="error"
           suggestions={
-            error.includes("File size exceeds 20MB limit")
+            error.includes("File size exceeds 4.5MB limit")
               ? [] // No suggestions for file size errors
               : error.includes("API key")
                 ? [
