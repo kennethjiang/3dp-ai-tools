@@ -26,6 +26,7 @@ import {
   Scale,
   Layers,
   Printer,
+  Sparkles,
 } from "lucide-react"
 import type { AnalysisResults, ExtractedFile, ConfigFile } from "@/types/analysis"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -497,15 +498,15 @@ export default function Home() {
           <Tabs defaultValue="analysis" className="space-y-8">
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="analysis" className="flex items-center gap-1">
-                <BarChart className="h-4 w-4" />
+                <Sparkles className="h-4 w-4" />
                 <span>AI Analysis</span>
               </TabsTrigger>
               <TabsTrigger value="filament" className="flex items-center gap-1">
-                <Layers className="h-4 w-4" />
+                <Printer className="h-4 w-4" />
                 <span>Filament Preset</span>
               </TabsTrigger>
               <TabsTrigger value="print" className="flex items-center gap-1">
-                <Printer className="h-4 w-4" />
+                <Layers className="h-4 w-4" />
                 <span>Process Preset</span>
               </TabsTrigger>
               <TabsTrigger value="files" className="flex items-center gap-1">
