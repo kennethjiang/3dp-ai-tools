@@ -480,17 +480,19 @@ export default function Home() {
           message={error}
           type="error"
           suggestions={
-            error.includes("API key")
-              ? [
-                  "Make sure you've added your OPENAI_API_KEY to the environment variables",
-                  "Check that your API key is valid and has not expired",
-                  "Verify that your OpenAI account has sufficient credits",
-                ]
-              : [
-                  "Check your OpenAI API key is valid and has sufficient credits",
-                  "Try again in a few moments as the API might be temporarily unavailable",
-                  "If the error persists, try a different 3MF file",
-                ]
+            error.includes("File size exceeds 20MB limit")
+              ? [] // No suggestions for file size errors
+              : error.includes("API key")
+                ? [
+                    "Make sure you've added your OPENAI_API_KEY to the environment variables",
+                    "Check that your API key is valid and has not expired",
+                    "Verify that your OpenAI account has sufficient credits",
+                  ]
+                : [
+                    "Check your OpenAI API key is valid and has sufficient credits",
+                    "Try again in a few moments as the API might be temporarily unavailable",
+                    "If the error persists, try a different 3MF file",
+                  ]
           }
         />
       )}
