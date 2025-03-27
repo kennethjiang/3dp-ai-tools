@@ -27,6 +27,7 @@ import {
   Layers,
   Printer,
   Sparkles,
+  Cylinder,
 } from "lucide-react"
 import type { AnalysisResults, ExtractedFile, ConfigFile } from "@/types/analysis"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -502,7 +503,7 @@ export default function Home() {
                 <span>AI Analysis</span>
               </TabsTrigger>
               <TabsTrigger value="filament" className="flex items-center gap-1">
-                <Printer className="h-4 w-4" />
+                <Cylinder className="h-4 w-4" />
                 <span>Filament Preset</span>
               </TabsTrigger>
               <TabsTrigger value="print" className="flex items-center gap-1">
