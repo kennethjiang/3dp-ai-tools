@@ -28,6 +28,7 @@ import {
   Printer,
   Sparkles,
   Cylinder,
+  Github,
 } from "lucide-react"
 import type { AnalysisResults, ExtractedFile, ConfigFile } from "@/types/analysis"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -418,9 +419,19 @@ export default function Home() {
 
   return (
     <main className="container mx-auto py-10 px-4">
-      <div className="flex items-center justify-center mb-8">
-        <img src="/favicon.svg" alt="3MF Analyzer Logo" className="w-10 h-10 mr-3" />
-        <h1 className="text-3xl font-bold">How was it sliced?</h1>
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center">
+          <img src="/favicon.svg" alt="3MF Analyzer Logo" className="w-10 h-10 mr-3" />
+          <h1 className="text-3xl font-bold">How was it sliced?</h1>
+        </div>
+        <a
+          href="https://github.com/kennethjiang/ai-3mf-analyzer"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center hover:text-primary transition-colors"
+        >
+          <Github className="h-6 w-6" />
+        </a>
       </div>
 
       <Card className="mb-8">
