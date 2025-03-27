@@ -1,0 +1,23 @@
+{
+  "name": "AI 3MF Analyzer",
+  "short_name": "3MF Analyzer",
+  "description": "Analyze 3D printing files for optimization",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#BBD6EC",
+  "theme_color": "#FF55C6",
+  "icons": [
+    {
+      "src": "/icons/app-icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "64x64",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
