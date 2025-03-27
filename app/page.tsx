@@ -32,7 +32,6 @@ import type { AnalysisResults, ExtractedFile, ConfigFile } from "@/types/analysi
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { ProjectSettingsViewer } from "@/components/project-settings-viewer"
 import { FilamentInfo } from "@/components/filament-info"
 import { PrintSettingsInfo } from "@/components/print-settings-info"
 import { SettingsComparison } from "@/components/settings-comparison"
@@ -498,14 +497,10 @@ export default function Home() {
       {results && !validationError && (
         <>
           <Tabs defaultValue="analysis" className="space-y-8">
-            <TabsList className="grid w-full grid-cols-6">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="analysis" className="flex items-center gap-1">
                 <BarChart className="h-4 w-4" />
                 <span>AI Analysis</span>
-              </TabsTrigger>
-              <TabsTrigger value="settings" className="flex items-center gap-1">
-                <Settings className="h-4 w-4" />
-                <span>Project Settings</span>
               </TabsTrigger>
               <TabsTrigger value="filament" className="flex items-center gap-1">
                 <Layers className="h-4 w-4" />
@@ -892,21 +887,6 @@ export default function Home() {
                   )}
                 </div>
               </div>
-            </TabsContent>
-
-            <TabsContent value="settings">
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center">
-                    <Settings className="h-5 w-5 mr-2 text-primary" />
-                    <CardTitle>Project Settings</CardTitle>
-                  </div>
-                  <CardDescription>Settings from Metadata/project_settings.config</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ProjectSettingsViewer settings={projectSettings} />
-                </CardContent>
-              </Card>
             </TabsContent>
 
             <TabsContent value="filament">
