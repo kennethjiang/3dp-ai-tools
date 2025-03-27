@@ -36,7 +36,6 @@ import { ProjectSettingsViewer } from "@/components/project-settings-viewer"
 import { FilamentInfo } from "@/components/filament-info"
 import { PrintSettingsInfo } from "@/components/print-settings-info"
 import { SettingsComparison } from "@/components/settings-comparison"
-import { ProjectDescription } from "@/components/project-description"
 import { ErrorMessage } from "@/components/error-message"
 
 interface ComparisonItem {
@@ -498,24 +497,6 @@ export default function Home() {
 
       {results && !validationError && (
         <>
-          {/* Project Description */}
-          <div className="mb-8">
-            {isComparisonLoading ? (
-              <Card>
-                <CardContent className="flex flex-col items-center justify-center py-10">
-                  <Loader2 className="h-10 w-10 text-primary animate-spin mb-4" />
-                  <p className="text-muted-foreground">Loading settings comparison...</p>
-                </CardContent>
-              </Card>
-            ) : (
-              <ProjectDescription
-                filamentSettingsId={filamentSettingsId}
-                printSettingsId={printSettingsId}
-                comparisonItems={comparisonItems}
-              />
-            )}
-          </div>
-
           <Tabs defaultValue="analysis" className="space-y-8">
             <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="analysis" className="flex items-center gap-1">
