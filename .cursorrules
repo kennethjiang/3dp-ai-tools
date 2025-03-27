@@ -1,0 +1,14 @@
+{
+  "rules": [
+    {
+      "name": "use-correct-nodejs",
+      "description": "Ensure the correct Node.js version is used before running commands",
+      "before": [
+        {
+          "command": "nvm use",
+          "description": "Switch to the correct Node.js version before running any commands"
+        }
+      ]
+    }
+  ]
+}
