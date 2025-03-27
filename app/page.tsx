@@ -235,6 +235,13 @@ export default function Home() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0]
+      // Check file size (20MB limit)
+      if (selectedFile.size > 20 * 1024 * 1024) {
+        setFile(null)
+        setError("File size exceeds 20MB limit. Please select a smaller file.")
+        return
+      }
+
       if (selectedFile.name.endsWith(".3mf")) {
         setFile(selectedFile)
         setError(null)
@@ -262,6 +269,13 @@ export default function Home() {
 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const droppedFile = e.dataTransfer.files[0]
+      // Check file size (20MB limit)
+      if (droppedFile.size > 20 * 1024 * 1024) {
+        setFile(null)
+        setError("File size exceeds 20MB limit. Please select a smaller file.")
+        return
+      }
+
       if (droppedFile.name.endsWith(".3mf")) {
         setFile(droppedFile)
         setError(null)
@@ -441,6 +455,7 @@ export default function Home() {
                   <Upload className="h-10 w-10 text-muted-foreground mb-2" />
                   <p className="text-sm font-medium">Drag and drop your 3MF file here</p>
                   <p className="text-xs text-muted-foreground mt-1">or click to browse</p>
+                  <p className="text-xs text-muted-foreground mt-2">Maximum file size: 20MB</p>
                 </div>
               )}
             </div>
