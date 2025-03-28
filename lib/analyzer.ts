@@ -138,15 +138,14 @@ export async function analyze3mfFile(
     }
 
     // Create a description of the profile for analysis
-    let profileDescription = "3D Printing Profile Analysis:\n\n"
+    let profileDescription = `Filament Preset: ${projectSettings.filament_settings_id[0]}\n\n`
 
     // Add project settings to the description
-    profileDescription += "Project Settings:\n"
-    profileDescription += JSON.stringify(projectSettings, null, 2) + "\n\n"
+    profileDescription += `Print Process Preset: ${projectSettings.print_settings_id}\n\n`
 
     // Add information about modified settings if available
     if (projectSettings.different_settings_to_system && Array.isArray(projectSettings.different_settings_to_system)) {
-      profileDescription += "Modified Settings:\n"
+      profileDescription += "The following slicing parameters are further fine-tuned to be different from those in the presets:\n"
       projectSettings.different_settings_to_system.forEach((settingGroup, index) => {
         if (typeof settingGroup === "string") {
           profileDescription += `Group ${index + 1}: ${settingGroup}\n`
