@@ -7,8 +7,8 @@ import { createTrace, createSpan } from "./langfuse"
 // Define structured output models using Zod
 const ParameterEffect = z.object({
   parameter: z.string().describe("The name of the modified parameter"),
-  original_value: z.union([z.string(), z.number()]).describe("The original value of the parameter"),
-  new_value: z.union([z.string(), z.number()]).describe("The new value of the parameter"),
+  original_value: z.union([z.string(), z.number(), z.boolean()]).describe("The original value of the parameter"),
+  new_value: z.union([z.string(), z.number(), z.boolean()]).describe("The new value of the parameter"),
   purpose: z.string().describe("The likely purpose of this specific modification"),
   effect: z.string().describe("The expected effect on the print"),
 })
@@ -35,12 +35,17 @@ function getBaseUrl() {
     if (process.env.VERCEL_URL) {
       return `https://${process.env.VERCEL_URL}`
     }
-    // Local development fallback
+    // Local development fallback - always use HTTP for localhost
     return "http://localhost:3000"
   }
 
   // For client-side rendering, use the current window location
-  return window.location.origin
+  // but ensure localhost connections use HTTP
+  const origin = window.location.origin
+  if (origin.includes('localhost')) {
+    return origin.replace('https:', 'http:')
+  }
+  return origin
 }
 
 /**
@@ -122,7 +127,9 @@ async function getStructuredAnalysisFromOpenAI(
   } catch (error) {
     // Log the error to Langfuse
     await span.update({
-      error: error instanceof Error ? error.message : String(error),
+      metadata: {
+        error: error instanceof Error ? error.message : String(error)
+      }
     })
     throw error
   }

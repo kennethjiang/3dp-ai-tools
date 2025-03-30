@@ -1,7 +1,7 @@
 export interface ParameterAnalysis {
   parameter: string
-  originalValue: string | number
-  newValue: string | number
+  originalValue: string | number | boolean
+  newValue: string | number | boolean
   purpose: string
   effect: string
 }
