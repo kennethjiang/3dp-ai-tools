@@ -102,7 +102,7 @@ export default function Home() {
       try {
         // Get the profile map using the environment variable
         const profileRoot = process.env.PROFILE_ROOT || "https://obico-public.s3.amazonaws.com/slicer-profiles/"
-        const mapResponse = await fetch(`${profileRoot}profile_map.json`)
+        const mapResponse = await fetch(`${profileRoot}preset_map.json`)
 
         if (!mapResponse.ok) {
           throw new Error(`Failed to fetch profile map: ${mapResponse.status} ${mapResponse.statusText}`)
@@ -113,8 +113,8 @@ export default function Home() {
         let filamentSettingsData = null
 
         // Fetch print settings if available
-        if (printSettingsId && mapData.process_map) {
-          const printEntry = mapData.process_map[printSettingsId]
+        if (printSettingsId) {
+          const printEntry = mapData[printSettingsId]
           if (printEntry && printEntry.sub_path) {
             const detailUrl = `${profileRoot}${printEntry.sub_path}`
             console.log(`Fetching detailed print settings from: ${detailUrl}`)
@@ -129,8 +129,8 @@ export default function Home() {
         }
 
         // Fetch filament settings if available
-        if (filamentSettingsId && mapData.filament_map) {
-          const filamentEntry = mapData.filament_map[filamentSettingsId]
+        if (filamentSettingsId) {
+          const filamentEntry = mapData[filamentSettingsId]
           if (filamentEntry && filamentEntry.sub_path) {
             const detailUrl = `${profileRoot}${filamentEntry.sub_path}`
             console.log(`Fetching detailed filament settings from: ${detailUrl}`)
@@ -311,7 +311,7 @@ export default function Home() {
       // Check profile map availability first before wasting API resources
       try {
         const profileRoot = process.env.PROFILE_ROOT || "https://obico-public.s3.amazonaws.com/slicer-profiles/"
-        const mapResponse = await fetch(`${profileRoot}profile_map.json`)
+        const mapResponse = await fetch(`${profileRoot}preset_map.json`)
 
         if (!mapResponse.ok) {
           throw new Error(`Failed to fetch profile map: ${mapResponse.status} ${mapResponse.statusText}`)

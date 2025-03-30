@@ -14,8 +14,8 @@ export function ErrorMessage({ title, message, type = "error", suggestions }: Er
   let errorInfo = null
   if (message.includes("Failed to fetch profile map:") && message.includes("403 Forbidden")) {
     errorInfo = {
-      profileName: "Profile Map",
-      profileUrl: "https://obico-public.s3.amazonaws.com/slicer-profiles/profile_map.json"
+      profileName: "Preset Map",
+      profileUrl: "https://obico-public.s3.amazonaws.com/slicer-profiles/preset_map.json"
     }
   }
 

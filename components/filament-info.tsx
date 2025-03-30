@@ -39,7 +39,7 @@ export function FilamentInfo({ filamentSettingsId }: FilamentInfoProps) {
       try {
         // Get the profile map using the environment variable
         const profileRoot = process.env.PROFILE_ROOT || "https://obico-public.s3.amazonaws.com/slicer-profiles/"
-        const mapResponse = await fetch(`${profileRoot}profile_map.json`)
+        const mapResponse = await fetch(`${profileRoot}preset_map.json`)
 
         if (!mapResponse.ok) {
           throw new Error(`Failed to fetch profile map: ${mapResponse.status} ${mapResponse.statusText}`)
@@ -47,11 +47,7 @@ export function FilamentInfo({ filamentSettingsId }: FilamentInfoProps) {
 
         const mapData = await mapResponse.json()
 
-        if (!mapData.filament_map) {
-          throw new Error("Profile map does not contain filament_map property")
-        }
-
-        const entry = mapData.filament_map[filamentSettingsId]
+        const entry = mapData[filamentSettingsId]
 
         if (!entry) {
           throw new Error(`No filament profile found for ID: ${filamentSettingsId}`)
