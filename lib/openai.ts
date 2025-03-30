@@ -7,8 +7,8 @@ import { createTrace, createSpan } from "./langfuse"
 // Define structured output models using Zod
 const ParameterEffect = z.object({
   parameter: z.string().describe("The name of the modified parameter"),
-  original_value: z.union([z.string(), z.number(), z.boolean()]).describe("The original value of the parameter"),
-  new_value: z.union([z.string(), z.number(), z.boolean()]).describe("The new value of the parameter"),
+  original_value: z.union([z.string(), z.number()]).describe("The original value of the parameter (for boolean values, use string '0' or '1')"),
+  new_value: z.union([z.string(), z.number()]).describe("The new value of the parameter (for boolean values, use string '0' or '1')"),
   purpose: z.string().describe("The likely purpose of this specific modification"),
   effect: z.string().describe("The expected effect on the print"),
 })
@@ -123,6 +123,20 @@ async function getStructuredAnalysisFromOpenAI(
 
     // Parse and validate with Zod
     const parsedArgs = JSON.parse(functionCall.arguments)
+
+    // Convert boolean values in parameter_effects to strings "0" or "1"
+    if (parsedArgs.parameter_effects && Array.isArray(parsedArgs.parameter_effects)) {
+      parsedArgs.parameter_effects = parsedArgs.parameter_effects.map((effect: any) => ({
+        ...effect,
+        original_value: typeof effect.original_value === 'boolean'
+          ? (effect.original_value ? "1" : "0")
+          : effect.original_value,
+        new_value: typeof effect.new_value === 'boolean'
+          ? (effect.new_value ? "1" : "0")
+          : effect.new_value
+      }))
+    }
+
     return SlicingProfileAnalysis.parse(parsedArgs)
   } catch (error) {
     // Log the error to Langfuse
@@ -208,8 +222,12 @@ export async function getStructuredAnalysis(profileDescription: string): Promise
         parameterAnalysis: Array.isArray(data?.parameter_effects)
           ? data.parameter_effects.map((effect: any) => ({
               parameter: effect?.parameter || "Unknown",
-              originalValue: effect?.original_value != null ? effect.original_value : "N/A",
-              newValue: effect?.new_value != null ? effect.new_value : "N/A",
+              originalValue: typeof effect?.original_value === 'boolean'
+                ? (effect.original_value ? "1" : "0")
+                : (effect?.original_value != null ? effect.original_value : "N/A"),
+              newValue: typeof effect?.new_value === 'boolean'
+                ? (effect.new_value ? "1" : "0")
+                : (effect?.new_value != null ? effect.new_value : "N/A"),
               purpose: effect?.purpose || "Not specified",
               effect: effect?.effect || "Not specified",
             }))

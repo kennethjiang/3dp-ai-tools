@@ -52,8 +52,8 @@ export async function POST(request: NextRequest) {
               '  "parameter_effects": [\n' +
               "    {\n" +
               '      "parameter": "string",\n' +
-              '      "original_value": "string or number",\n' +
-              '      "new_value": "string or number",\n' +
+              '      "original_value": "string or number (do not use boolean, represent boolean values as string \"0\" or \"1\")",\n' +
+              '      "new_value": "string or number (do not use boolean, represent boolean values as string \"0\" or \"1\")",\n' +
               '      "purpose": "string",\n' +
               '      "effect": "string"\n' +
               "    },\n" +
