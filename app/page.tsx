@@ -296,6 +296,7 @@ export default function Home() {
       return
     }
 
+    // Reset all state before starting new analysis
     setIsLoading(true)
     setError(null)
     setResults(null)
@@ -307,8 +308,36 @@ export default function Home() {
     setValidationError(null)
 
     try {
+      // Check profile map availability first before wasting API resources
+      try {
+        const profileRoot = process.env.PROFILE_ROOT || "https://obico-public.s3.amazonaws.com/slicer-profiles/"
+        const mapResponse = await fetch(`${profileRoot}profile_map.json`)
+
+        if (!mapResponse.ok) {
+          throw new Error(`Failed to fetch profile map: ${mapResponse.status} ${mapResponse.statusText}`)
+        }
+
+        // Only proceed with file analysis if profile map is accessible
+        await processFileAnalysis()
+      } catch (profileMapError) {
+        console.error("Error checking profile map:", profileMapError)
+        setError(profileMapError instanceof Error ? profileMapError.message : "Failed to access profile data")
+        setIsLoading(false)
+        return
+      }
+    } catch (err) {
+      console.error("Analysis error:", err)
+      setResults(null)
+      setError(err instanceof Error ? err.message : "An unknown error occurred")
+      setIsLoading(false)
+    }
+  }
+
+  // Separated file analysis process to keep code clean
+  const processFileAnalysis = async () => {
+    try {
       const formData = new FormData()
-      formData.append("file", file)
+      formData.append("file", file!)
 
       const response = await fetch("/api/analyze", {
         method: "POST",
@@ -336,7 +365,7 @@ export default function Home() {
       if (!response.ok) {
         if (data.error && data.error.includes("No project settings found")) {
           setValidationError(
-            data.error + " Please try a different 3MF file that was created with PrusaSlicer or a compatible slicer.",
+            data.error + " Please try a different 3MF file that was created with PrusaSlicer or a compatible slicer."
           )
         } else if (data.error && data.error.includes("OpenAI API")) {
           setError("OpenAI API Error: " + data.error)
@@ -349,50 +378,60 @@ export default function Home() {
       // Check if the required file exists (case-insensitive search)
       const requiredFilePath = "Metadata/project_settings.config"
       const hasRequiredFile = data.extractedFiles.some(
-        (extractedFile: ExtractedFile) => extractedFile.name.toLowerCase() === requiredFilePath.toLowerCase(),
+        (extractedFile: ExtractedFile) => extractedFile.name.toLowerCase() === requiredFilePath.toLowerCase()
       )
 
       if (!hasRequiredFile) {
         setValidationError(`Invalid 3mf file. ${requiredFilePath} not found`)
+        // Explicitly set results to null to prevent partial display
         setResults(null)
-      } else {
-        setResults(data)
+        return
+      }
 
-        // Find the project settings file in configFiles
-        const settingsFile = data.configFiles.find(
-          (configFile: ConfigFile) => configFile.path.toLowerCase() === requiredFilePath.toLowerCase(),
+      // Set results only if no errors so far
+      setResults(data)
+
+      // Find the project settings file in configFiles
+      const settingsFile = data.configFiles.find(
+        (configFile: ConfigFile) => configFile.path.toLowerCase() === requiredFilePath.toLowerCase()
+      )
+
+      if (settingsFile) {
+        console.log("Found settings file in configFiles:", settingsFile)
+        setProjectSettings(settingsFile.content)
+      } else {
+        // Fallback: If not found in configFiles, try to find it in extractedFiles and parse it
+        console.log("Settings file not found in configFiles, searching in extractedFiles...")
+        const rawFile = data.extractedFiles.find(
+          (file: ExtractedFile) => file.name.toLowerCase() === requiredFilePath.toLowerCase()
         )
 
-        if (settingsFile) {
-          console.log("Found settings file in configFiles:", settingsFile)
-          setProjectSettings(settingsFile.content)
-        } else {
-          // Fallback: If not found in configFiles, try to find it in extractedFiles and parse it
-          console.log("Settings file not found in configFiles, searching in extractedFiles...")
-          const rawFile = data.extractedFiles.find(
-            (file: ExtractedFile) => file.name.toLowerCase() === requiredFilePath.toLowerCase(),
-          )
-
-          if (rawFile && rawFile.content) {
-            console.log("Found raw settings file in extractedFiles:", rawFile.name)
-            try {
-              // Try to parse the content as JSON
-              const parsedContent = JSON.parse(rawFile.content)
-              console.log("Successfully parsed settings file content")
-              setProjectSettings(parsedContent)
-            } catch (parseError) {
-              console.error("Error parsing settings file:", parseError)
-              setError(
-                `Error parsing settings file: ${parseError instanceof Error ? parseError.message : "Unknown error"}`,
-              )
-            }
-          } else {
-            console.error("Settings file not found in extractedFiles either")
+        if (rawFile && rawFile.content) {
+          console.log("Found raw settings file in extractedFiles:", rawFile.name)
+          try {
+            // Try to parse the content as JSON
+            const parsedContent = JSON.parse(rawFile.content)
+            console.log("Successfully parsed settings file content")
+            setProjectSettings(parsedContent)
+          } catch (parseError) {
+            console.error("Error parsing settings file:", parseError)
+            // Clear results if we can't parse settings file
+            setResults(null)
+            setError(
+              `Error parsing settings file: ${parseError instanceof Error ? parseError.message : "Unknown error"}`
+            )
+            return
           }
+        } else {
+          console.error("Settings file not found in extractedFiles either")
+          // Clear results if settings file not found
+          setResults(null)
+          setError("Settings file not found in the 3MF file")
+          return
         }
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An unknown error occurred")
+      throw err
     } finally {
       setIsLoading(false)
     }
