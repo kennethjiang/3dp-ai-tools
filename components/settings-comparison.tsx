@@ -59,7 +59,11 @@ export function SettingsComparison({
         // Fetch print settings if available
         if (printSettingsId) {
           const printEntry = mapData[printSettingsId]
-          if (printEntry && printEntry.sub_path) {
+          if (!printEntry) {
+            throw new Error(`No print settings found for ID: ${printSettingsId}`)
+          }
+
+          if (printEntry.sub_path) {
             const detailUrl = `${profileRoot}${printEntry.sub_path}`
             console.log(`Fetching detailed print settings from: ${detailUrl}`)
 
@@ -69,6 +73,8 @@ export function SettingsComparison({
               setPrintSettings(detailData)
               printSettingsData = detailData
               console.log("Print settings loaded successfully for comparison")
+            } else {
+              throw new Error(`Failed to fetch detailed print settings: ${detailResponse.status} ${detailResponse.statusText}`)
             }
           }
         }
@@ -76,7 +82,11 @@ export function SettingsComparison({
         // Fetch filament settings if available
         if (filamentSettingsId) {
           const filamentEntry = mapData[filamentSettingsId]
-          if (filamentEntry && filamentEntry.sub_path) {
+          if (!filamentEntry) {
+            throw new Error(`No filament profile found for ID: ${filamentSettingsId}`)
+          }
+
+          if (filamentEntry.sub_path) {
             const detailUrl = `${profileRoot}${filamentEntry.sub_path}`
             console.log(`Fetching detailed filament settings from: ${detailUrl}`)
 
@@ -86,6 +96,8 @@ export function SettingsComparison({
               setFilamentSettings(detailData)
               filamentSettingsData = detailData
               console.log("Filament settings loaded successfully for comparison")
+            } else {
+              throw new Error(`Failed to fetch detailed filament settings: ${detailResponse.status} ${detailResponse.statusText}`)
             }
           }
         }

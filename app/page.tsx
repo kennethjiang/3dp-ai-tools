@@ -37,6 +37,8 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { FilamentInfo } from "@/components/filament-info"
 import { PrintSettingsInfo } from "@/components/print-settings-info"
 import { ErrorMessage } from "@/components/error-message"
+import { SettingsComparison } from "@/components/settings-comparison"
+import ErrorBoundary from "@/components/error-boundary"
 
 interface ComparisonItem {
   key: string
@@ -115,7 +117,11 @@ export default function Home() {
         // Fetch print settings if available
         if (printSettingsId) {
           const printEntry = mapData[printSettingsId]
-          if (printEntry && printEntry.sub_path) {
+          if (!printEntry) {
+            throw new Error(`No print settings found for ID: ${printSettingsId}`)
+          }
+
+          if (printEntry.sub_path) {
             const detailUrl = `${profileRoot}${printEntry.sub_path}`
             console.log(`Fetching detailed print settings from: ${detailUrl}`)
 
@@ -124,6 +130,8 @@ export default function Home() {
               const detailData = await detailResponse.json()
               printSettingsData = detailData
               console.log("Print settings loaded successfully for comparison")
+            } else {
+              throw new Error(`Failed to fetch detailed print settings: ${detailResponse.status} ${detailResponse.statusText}`)
             }
           }
         }
@@ -131,7 +139,11 @@ export default function Home() {
         // Fetch filament settings if available
         if (filamentSettingsId) {
           const filamentEntry = mapData[filamentSettingsId]
-          if (filamentEntry && filamentEntry.sub_path) {
+          if (!filamentEntry) {
+            throw new Error(`No filament profile found for ID: ${filamentSettingsId}`)
+          }
+
+          if (filamentEntry.sub_path) {
             const detailUrl = `${profileRoot}${filamentEntry.sub_path}`
             console.log(`Fetching detailed filament settings from: ${detailUrl}`)
 
@@ -140,6 +152,8 @@ export default function Home() {
               const detailData = await detailResponse.json()
               filamentSettingsData = detailData
               console.log("Filament settings loaded successfully for comparison")
+            } else {
+              throw new Error(`Failed to fetch detailed filament settings: ${detailResponse.status} ${detailResponse.statusText}`)
             }
           }
         }
@@ -151,6 +165,8 @@ export default function Home() {
       } catch (err) {
         console.error("Error fetching settings:", err)
         setError(err instanceof Error ? err.message : "Failed to fetch settings")
+        // Reset results to show the error properly
+        setResults(null)
       } finally {
         setIsComparisonLoading(false)
       }
@@ -454,6 +470,13 @@ export default function Home() {
     if (bytes < 1024) return `${bytes} B`
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+  }
+
+  // Function to handle errors from child components
+  const handleComponentError = (err: Error) => {
+    console.error("Component error:", err)
+    setError(err.message)
+    setResults(null)
   }
 
   return (
@@ -952,11 +975,15 @@ export default function Home() {
             </TabsContent>
 
             <TabsContent value="filament">
-              <FilamentInfo filamentSettingsId={filamentSettingsId} />
+              <ErrorBoundary onError={handleComponentError}>
+                <FilamentInfo filamentSettingsId={filamentSettingsId} />
+              </ErrorBoundary>
             </TabsContent>
 
             <TabsContent value="print">
-              <PrintSettingsInfo printSettingsId={printSettingsId} />
+              <ErrorBoundary onError={handleComponentError}>
+                <PrintSettingsInfo printSettingsId={printSettingsId} />
+              </ErrorBoundary>
             </TabsContent>
 
             <TabsContent value="files">
