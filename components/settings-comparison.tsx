@@ -23,6 +23,12 @@ interface ComparisonItem {
   source: "print" | "filament"
 }
 
+interface Preset {
+  name: string
+  sub_path?: string
+  [key: string]: any
+}
+
 export function SettingsComparison({
   printSettingsId,
   filamentSettingsId,
@@ -44,21 +50,21 @@ export function SettingsComparison({
       setComparisonItems([])
 
       try {
-        // Get the profile map using the environment variable
+        // Get the presets using the environment variable
         const profileRoot = process.env.PROFILE_ROOT || "https://obico-public.s3.amazonaws.com/slicer-profiles/"
-        const mapResponse = await fetch(`${profileRoot}preset_map.json`)
+        const presetsResponse = await fetch(`${profileRoot}presets.json`)
 
-        if (!mapResponse.ok) {
-          throw new Error(`Failed to fetch profile map: ${mapResponse.status} ${mapResponse.statusText}`)
+        if (!presetsResponse.ok) {
+          throw new Error(`Failed to fetch presets: ${presetsResponse.status} ${presetsResponse.statusText}`)
         }
 
-        const mapData = await mapResponse.json()
+        const presets = await presetsResponse.json() as Preset[]
         let printSettingsData = null
         let filamentSettingsData = null
 
         // Fetch print settings if available
         if (printSettingsId) {
-          const printEntry = mapData[printSettingsId]
+          const printEntry = presets.find((preset: Preset) => preset.name === printSettingsId)
           if (!printEntry) {
             throw new Error(`No print settings found for ID: ${printSettingsId}`)
           }
@@ -81,7 +87,7 @@ export function SettingsComparison({
 
         // Fetch filament settings if available
         if (filamentSettingsId) {
-          const filamentEntry = mapData[filamentSettingsId]
+          const filamentEntry = presets.find((preset: Preset) => preset.name === filamentSettingsId)
           if (!filamentEntry) {
             throw new Error(`No filament profile found for ID: ${filamentSettingsId}`)
           }

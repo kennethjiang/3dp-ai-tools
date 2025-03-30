@@ -48,6 +48,12 @@ interface ComparisonItem {
   source: "print" | "filament"
 }
 
+// Define preset interface
+interface Preset {
+  name: string
+  sub_path: string
+}
+
 export default function Home() {
   const [file, setFile] = useState<File | null>(null)
   const [isDragging, setIsDragging] = useState<boolean>(false)
@@ -104,19 +110,19 @@ export default function Home() {
       try {
         // Get the profile map using the environment variable
         const profileRoot = process.env.PROFILE_ROOT || "https://obico-public.s3.amazonaws.com/slicer-profiles/"
-        const mapResponse = await fetch(`${profileRoot}preset_map.json`)
+        const mapResponse = await fetch(`${profileRoot}presets.json`)
 
         if (!mapResponse.ok) {
-          throw new Error(`Failed to fetch profile map: ${mapResponse.status} ${mapResponse.statusText}`)
+          throw new Error(`Failed to fetch presets: ${mapResponse.status} ${mapResponse.statusText}`)
         }
 
-        const mapData = await mapResponse.json()
+        const presetsArray = await mapResponse.json() as Preset[]
         let printSettingsData = null
         let filamentSettingsData = null
 
         // Fetch print settings if available
         if (printSettingsId) {
-          const printEntry = mapData[printSettingsId]
+          const printEntry = presetsArray.find((preset: Preset) => preset.name === printSettingsId)
           if (!printEntry) {
             throw new Error(`No print settings found for ID: ${printSettingsId}`)
           }
@@ -138,7 +144,7 @@ export default function Home() {
 
         // Fetch filament settings if available
         if (filamentSettingsId) {
-          const filamentEntry = mapData[filamentSettingsId]
+          const filamentEntry = presetsArray.find((preset: Preset) => preset.name === filamentSettingsId)
           if (!filamentEntry) {
             throw new Error(`No filament profile found for ID: ${filamentSettingsId}`)
           }
@@ -327,17 +333,17 @@ export default function Home() {
       // Check profile map availability first before wasting API resources
       try {
         const profileRoot = process.env.PROFILE_ROOT || "https://obico-public.s3.amazonaws.com/slicer-profiles/"
-        const mapResponse = await fetch(`${profileRoot}preset_map.json`)
+        const mapResponse = await fetch(`${profileRoot}presets.json`)
 
         if (!mapResponse.ok) {
-          throw new Error(`Failed to fetch profile map: ${mapResponse.status} ${mapResponse.statusText}`)
+          throw new Error(`Failed to fetch presets: ${mapResponse.status} ${mapResponse.statusText}`)
         }
 
-        // Only proceed with file analysis if profile map is accessible
+        // Only proceed with file analysis if presets are accessible
         await processFileAnalysis()
       } catch (profileMapError) {
-        console.error("Error checking profile map:", profileMapError)
-        setError(profileMapError instanceof Error ? profileMapError.message : "Failed to access profile data")
+        console.error("Error checking presets:", profileMapError)
+        setError(profileMapError instanceof Error ? profileMapError.message : "Failed to access preset data")
         setIsLoading(false)
         return
       }

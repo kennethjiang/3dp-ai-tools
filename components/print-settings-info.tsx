@@ -10,8 +10,7 @@ interface PrintSettingsInfoProps {
   printSettingsId: string | null
 }
 
-interface PrintSettingsMapEntry {
-  id: string
+interface Preset {
   name: string
   sub_path?: string
   [key: string]: any
@@ -20,7 +19,7 @@ interface PrintSettingsMapEntry {
 export function PrintSettingsInfo({ printSettingsId }: PrintSettingsInfoProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
-  const [printSettingsMapEntry, setPrintSettingsMapEntry] = useState<PrintSettingsMapEntry | null>(null)
+  const [printSettingsPreset, setPrintSettingsPreset] = useState<Preset | null>(null)
   const [detailedProfile, setDetailedProfile] = useState<any | null>(null)
   const [activeTab, setActiveTab] = useState<string>("summary")
 
@@ -30,27 +29,27 @@ export function PrintSettingsInfo({ printSettingsId }: PrintSettingsInfoProps) {
 
       setIsLoading(true)
       setError(null)
-      setPrintSettingsMapEntry(null)
+      setPrintSettingsPreset(null)
       setDetailedProfile(null)
 
       try {
-        // Get the profile map using the environment variable
+        // Get the presets using the environment variable
         const profileRoot = process.env.PROFILE_ROOT || "https://obico-public.s3.amazonaws.com/slicer-profiles/"
-        const mapResponse = await fetch(`${profileRoot}preset_map.json`)
+        const presetsResponse = await fetch(`${profileRoot}presets.json`)
 
-        if (!mapResponse.ok) {
-          throw new Error(`Failed to fetch profile map: ${mapResponse.status} ${mapResponse.statusText}`)
+        if (!presetsResponse.ok) {
+          throw new Error(`Failed to fetch presets: ${presetsResponse.status} ${presetsResponse.statusText}`)
         }
 
-        const mapData = await mapResponse.json()
+        const presets = await presetsResponse.json() as Preset[]
 
-        const entry = mapData[printSettingsId]
+        const entry = presets.find(preset => preset.name === printSettingsId)
 
         if (!entry) {
           throw new Error(`No print settings found for ID: ${printSettingsId}`)
         }
 
-        setPrintSettingsMapEntry(entry)
+        setPrintSettingsPreset(entry)
 
         // If the entry has a sub_path, fetch the detailed profile
         if (entry.sub_path) {
@@ -110,7 +109,7 @@ export function PrintSettingsInfo({ printSettingsId }: PrintSettingsInfoProps) {
     )
   }
 
-  if (!printSettingsMapEntry) {
+  if (!printSettingsPreset) {
     return null
   }
 
@@ -146,14 +145,14 @@ export function PrintSettingsInfo({ printSettingsId }: PrintSettingsInfoProps) {
 
                 <div className="space-y-2">
                   <h3 className="text-sm font-medium text-muted-foreground">Name</h3>
-                  <p className="font-medium">{printSettingsMapEntry.name}</p>
+                  <p className="font-medium">{printSettingsPreset.name}</p>
                 </div>
               </div>
 
-              {printSettingsMapEntry.sub_path && (
+              {printSettingsPreset.sub_path && (
                 <div className="space-y-2">
                   <h3 className="text-sm font-medium text-muted-foreground">Profile Path</h3>
-                  <p className="text-xs font-mono truncate">{printSettingsMapEntry.sub_path}</p>
+                  <p className="text-xs font-mono truncate">{printSettingsPreset.sub_path}</p>
                 </div>
               )}
 
@@ -161,8 +160,8 @@ export function PrintSettingsInfo({ printSettingsId }: PrintSettingsInfoProps) {
               <div className="mt-4 pt-4 border-t">
                 <h3 className="text-sm font-medium mb-3">Additional Properties</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {Object.entries(printSettingsMapEntry)
-                    .filter(([key]) => !["id", "name", "sub_path"].includes(key))
+                  {Object.entries(printSettingsPreset)
+                    .filter(([key]) => !["name", "sub_path"].includes(key))
                     .map(([key, value]) => (
                       <div key={key} className="flex justify-between p-2 bg-muted/30 rounded">
                         <span className="text-xs font-medium">{key.replace(/_/g, " ")}</span>

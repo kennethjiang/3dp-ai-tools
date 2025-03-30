@@ -12,10 +12,10 @@ interface ErrorMessageProps {
 export function ErrorMessage({ title, message, type = "error", suggestions }: ErrorMessageProps) {
   // Extract URL information when it's a profile fetch error
   let errorInfo = null
-  if (message.includes("Failed to fetch profile map:") && message.includes("403 Forbidden")) {
+  if (message.includes("Failed to fetch presets:") && message.includes("403 Forbidden")) {
     errorInfo = {
-      profileName: "Preset Map",
-      profileUrl: "https://obico-public.s3.amazonaws.com/slicer-profiles/preset_map.json"
+      profileName: "Presets List",
+      profileUrl: "https://obico-public.s3.amazonaws.com/slicer-profiles/presets.json"
     }
   }
 

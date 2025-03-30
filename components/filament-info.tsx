@@ -11,8 +11,7 @@ interface FilamentInfoProps {
   filamentSettingsId: string | null
 }
 
-interface FilamentMapEntry {
-  id: string
+interface Preset {
   name: string
   material?: string
   vendor?: string
@@ -23,7 +22,7 @@ interface FilamentMapEntry {
 export function FilamentInfo({ filamentSettingsId }: FilamentInfoProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
-  const [filamentMapEntry, setFilamentMapEntry] = useState<FilamentMapEntry | null>(null)
+  const [filamentPreset, setFilamentPreset] = useState<Preset | null>(null)
   const [detailedProfile, setDetailedProfile] = useState<any | null>(null)
   const [activeTab, setActiveTab] = useState<string>("summary")
 
@@ -33,27 +32,27 @@ export function FilamentInfo({ filamentSettingsId }: FilamentInfoProps) {
 
       setIsLoading(true)
       setError(null)
-      setFilamentMapEntry(null)
+      setFilamentPreset(null)
       setDetailedProfile(null)
 
       try {
-        // Get the profile map using the environment variable
+        // Get the presets using the environment variable
         const profileRoot = process.env.PROFILE_ROOT || "https://obico-public.s3.amazonaws.com/slicer-profiles/"
-        const mapResponse = await fetch(`${profileRoot}preset_map.json`)
+        const presetsResponse = await fetch(`${profileRoot}presets.json`)
 
-        if (!mapResponse.ok) {
-          throw new Error(`Failed to fetch profile map: ${mapResponse.status} ${mapResponse.statusText}`)
+        if (!presetsResponse.ok) {
+          throw new Error(`Failed to fetch presets: ${presetsResponse.status} ${presetsResponse.statusText}`)
         }
 
-        const mapData = await mapResponse.json()
+        const presets = await presetsResponse.json() as Preset[]
 
-        const entry = mapData[filamentSettingsId]
+        const entry = presets.find(preset => preset.name === filamentSettingsId)
 
         if (!entry) {
           throw new Error(`No filament profile found for ID: ${filamentSettingsId}`)
         }
 
-        setFilamentMapEntry(entry)
+        setFilamentPreset(entry)
 
         // If the entry has a sub_path, fetch the detailed profile
         if (entry.sub_path) {
@@ -111,7 +110,7 @@ export function FilamentInfo({ filamentSettingsId }: FilamentInfoProps) {
     )
   }
 
-  if (!filamentMapEntry) {
+  if (!filamentPreset) {
     return null
   }
 
@@ -147,7 +146,7 @@ export function FilamentInfo({ filamentSettingsId }: FilamentInfoProps) {
 
                 <div className="space-y-2">
                   <h3 className="text-sm font-medium text-muted-foreground">Name</h3>
-                  <p className="font-medium">{filamentMapEntry.name}</p>
+                  <p className="font-medium">{filamentPreset.name}</p>
                 </div>
               </div>
 
@@ -155,19 +154,19 @@ export function FilamentInfo({ filamentSettingsId }: FilamentInfoProps) {
                 <div className="space-y-2">
                   <h3 className="text-sm font-medium text-muted-foreground">Material</h3>
                   <Badge variant="outline" className="text-sm">
-                    {filamentMapEntry.material || "Unknown"}
+                    {filamentPreset.material || "Unknown"}
                   </Badge>
                 </div>
 
                 <div className="space-y-2">
                   <h3 className="text-sm font-medium text-muted-foreground">Vendor</h3>
-                  <p>{filamentMapEntry.vendor || "Unknown"}</p>
+                  <p>{filamentPreset.vendor || "Unknown"}</p>
                 </div>
 
-                {filamentMapEntry.sub_path && (
+                {filamentPreset.sub_path && (
                   <div className="space-y-2">
                     <h3 className="text-sm font-medium text-muted-foreground">Profile Path</h3>
-                    <p className="text-xs font-mono truncate">{filamentMapEntry.sub_path}</p>
+                    <p className="text-xs font-mono truncate">{filamentPreset.sub_path}</p>
                   </div>
                 )}
               </div>
@@ -176,8 +175,8 @@ export function FilamentInfo({ filamentSettingsId }: FilamentInfoProps) {
               <div className="mt-4 pt-4 border-t">
                 <h3 className="text-sm font-medium mb-3">Additional Properties</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {Object.entries(filamentMapEntry)
-                    .filter(([key]) => !["id", "name", "material", "vendor", "sub_path"].includes(key))
+                  {Object.entries(filamentPreset)
+                    .filter(([key]) => !["name", "material", "vendor", "sub_path"].includes(key))
                     .map(([key, value]) => (
                       <div key={key} className="flex justify-between p-2 bg-muted/30 rounded">
                         <span className="text-xs font-medium">{key.replace(/_/g, " ")}</span>
