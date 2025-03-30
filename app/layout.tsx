@@ -11,9 +11,10 @@ export const metadata = {
   generator: 'v0.dev',
   icons: {
     icon: [
-      { url: '/logo.png', type: 'image/png' },
-      { url: '/favicon.ico', sizes: 'any' }
+      { url: '/favicon.png', type: 'image/png' },
+      { url: '/logo.png', type: 'image/png' }
     ],
+    shortcut: '/favicon.png',
     apple: '/logo.png',
   },
   manifest: '/manifest.json',
@@ -28,8 +29,8 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/logo.png" type="image/png" />
-        <link rel="alternate icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/favicon.png" type="image/png" />
+        <link rel="shortcut icon" href="/favicon.png" type="image/png" />
         <link rel="apple-touch-icon" href="/logo.png" />
         <link rel="manifest" href="/manifest.json" />
       </head>
