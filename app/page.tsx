@@ -490,7 +490,7 @@ export default function Home() {
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center">
           <img src="/favicon.svg" alt="3MF Analyzer Logo" className="w-10 h-10 mr-3" />
-          <h1 className="text-3xl font-bold">How was it sliced?</h1>
+          <h1 className="text-3xl font-bold">How is it sliced?</h1>
         </div>
         <a
           href="https://github.com/kennethjiang/ai-3mf-analyzer"
