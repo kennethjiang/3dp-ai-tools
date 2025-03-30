@@ -524,7 +524,7 @@ export default function Home() {
         />
       )}
 
-      {results && !validationError && (
+      {results && !error && !validationError && (
         <>
           <Tabs defaultValue="analysis" className="space-y-8">
             <TabsList className="grid w-full grid-cols-4">
