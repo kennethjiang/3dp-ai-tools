@@ -53,43 +53,36 @@ export async function analyze3mfFile(
 
     extractedFiles.push(file)
 
-    // Check if this is a config file in the Metadata folder or any .config file
-    if (
-      (name.toLowerCase().includes("/metadata/") || name.toLowerCase().includes("\\metadata\\")) &&
-      (name.toLowerCase().endsWith(".config") || name.toLowerCase().endsWith(".json"))
-    ) {
+    // Only look for and process Metadata/project_settings.config file
+    if (name.toLowerCase() === "metadata/project_settings.config") {
       try {
         const textContent = new TextDecoder().decode(content)
         let jsonContent
 
         try {
           jsonContent = JSON.parse(textContent)
+          console.log(`Found project settings in: ${name}`)
+          projectSettings = jsonContent
 
-          // Store project settings for analysis
-          // Look for project_settings.config or any file that might contain settings
-          if (
-            name.toLowerCase().includes("project_settings") ||
-            (jsonContent && (jsonContent.print_settings_id || jsonContent.filament_settings_id))
-          ) {
-            console.log(`Found potential project settings in: ${name}`)
-            projectSettings = jsonContent
-          }
+          configFiles.push({
+            name: name.split("/").pop() || name,
+            path: name,
+            content: jsonContent,
+          })
         } catch (parseError) {
-          console.error(`Error parsing config file ${name} as JSON:`, parseError)
+          console.error(`Error parsing project settings file ${name} as JSON:`, parseError)
           // Try to handle non-standard JSON (like with comments or trailing commas)
           // For now, just store the raw text if parsing fails
           jsonContent = { rawContent: textContent, parseError: true }
+
+          configFiles.push({
+            name: name.split("/").pop() || name,
+            path: name,
+            content: jsonContent,
+          })
         }
-
-        configFiles.push({
-          name: name.split("/").pop() || name,
-          path: name,
-          content: jsonContent,
-        })
-
-        console.log(`Processed config file: ${name}`)
       } catch (error) {
-        console.error(`Error processing config file ${name}:`, error)
+        console.error(`Error processing project settings file ${name}:`, error)
       }
     }
   })
@@ -98,34 +91,40 @@ export async function analyze3mfFile(
   extractedFiles.sort((a, b) => a.name.localeCompare(b.name))
   configFiles.sort((a, b) => a.name.localeCompare(b.name))
 
-  // If we still don't have project settings, try to find any JSON file that might contain settings
+  // If we still don't have project settings, try to find it with case-insensitive matching
   if (!projectSettings) {
-    console.log("No project settings found in standard locations, searching all files...")
+    console.log("Project settings file not found, checking with case-insensitive matching...")
 
-    for (const file of extractedFiles) {
-      if (file.type === "application/json" && file.content) {
+    // Try to find project_settings.config with case-insensitive matching
+    const projectSettingsFile = Object.entries(fileContents).find(([name]) =>
+      name.toLowerCase() === "metadata/project_settings.config"
+    );
+
+    if (projectSettingsFile) {
+      const [name, content] = projectSettingsFile;
+      try {
+        const textContent = new TextDecoder().decode(content);
         try {
-          const jsonContent = JSON.parse(file.content)
-          if (jsonContent && (jsonContent.print_settings_id || jsonContent.filament_settings_id)) {
-            console.log(`Found potential project settings in: ${file.name}`)
-            projectSettings = jsonContent
+          const jsonContent = JSON.parse(textContent);
+          console.log(`Found project settings with case-insensitive matching: ${name}`);
+          projectSettings = jsonContent;
 
-            // Add to configFiles if not already there
-            if (!configFiles.some((cf) => cf.path === file.name)) {
-              configFiles.push({
-                name: file.name.split("/").pop() || file.name,
-                path: file.name,
-                content: jsonContent,
-              })
-            }
-
-            break
+          // Add to configFiles if not already there
+          if (!configFiles.some((cf) => cf.path.toLowerCase() === name.toLowerCase())) {
+            configFiles.push({
+              name: name.split("/").pop() || name,
+              path: name,
+              content: jsonContent,
+            });
           }
         } catch (error) {
-          // Skip files that can't be parsed as JSON
-          continue
+          console.error(`Error parsing project settings file ${name} as JSON:`, error);
         }
+      } catch (error) {
+        console.error(`Error processing project settings file ${name}:`, error);
       }
+    } else {
+      console.log("Project settings file not found.");
     }
   }
 
@@ -146,7 +145,7 @@ export async function analyze3mfFile(
     // Add information about modified settings if available
     if (projectSettings.different_settings_to_system && Array.isArray(projectSettings.different_settings_to_system)) {
       profileDescription += "The following slicing parameters are further fine-tuned to be different from those in the presets:\n"
-      projectSettings.different_settings_to_system.forEach((settingGroup, index) => {
+      projectSettings.different_settings_to_system.forEach((settingGroup: any, index: any) => {
         if (typeof settingGroup === "string") {
           profileDescription += `Group ${index + 1}: ${settingGroup}\n`
         }
