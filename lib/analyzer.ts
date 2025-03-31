@@ -1,5 +1,6 @@
 import type { AnalysisResults, ExtractedFile, ConfigFile } from "@/types/analysis"
 import { getStructuredAnalysis } from "./openai"
+import { getBaseUrl } from "./utils"
 
 /**
  * Analyzes a 3MF file from its extracted contents
@@ -136,25 +137,142 @@ export async function analyze3mfFile(
       }
     }
 
-    // Create a description of the profile for analysis
-    let profileDescription = `Filament Preset: ${projectSettings.filament_settings_id[0]}\n\n`
+    // Fetch preset data before constructing profile description
+    const profileRoot = process.env.PROFILE_ROOT || "https://obico-public.s3.amazonaws.com/slicer-profiles/"
 
-    // Add project settings to the description
-    profileDescription += `Print Process Preset: ${projectSettings.print_settings_id}\n\n`
+    // Utility function to fetch with retries
+    const fetchWithRetry = async (url: string, retries = 3, delay = 1000) => {
+      let lastError;
+
+      for (let i = 0; i < retries; i++) {
+        try {
+          // Node.js fetch doesn't support timeout option in RequestInit
+          // We'll use AbortController instead for clean timeouts
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+          try {
+            const response = await fetch(url, {
+              signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+            if (response.ok) return response;
+            lastError = new Error(`HTTP error ${response.status}: ${response.statusText}`);
+          } finally {
+            clearTimeout(timeoutId);
+          }
+        } catch (error) {
+          console.error(`Fetch attempt ${i + 1} failed:`, error);
+          lastError = error;
+        }
+
+        // Only delay if we're going to retry
+        if (i < retries - 1) {
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+      }
+
+      throw lastError;
+    };
+
+    let presets = [];
+    try {
+      const presetsResponse = await fetchWithRetry(`${profileRoot}presets.json`);
+      presets = await presetsResponse.json();
+    } catch (error) {
+      console.error("Failed to fetch presets, continuing with limited analysis:", error);
+      // Continue without presets - we'll create a profile description with just basic info
+    }
+
+    let printSettingsData = null;
+    let filamentSettingsData = null;
+
+    // Fetch print settings if available
+    if (presets.length > 0 && projectSettings.print_settings_id) {
+      try {
+        const printEntry = presets.find((preset: any) => preset.name === projectSettings.print_settings_id);
+        if (printEntry?.sub_path) {
+          const detailResponse = await fetchWithRetry(`${profileRoot}${printEntry.sub_path}`);
+          printSettingsData = await detailResponse.json();
+        }
+      } catch (error) {
+        console.error("Failed to fetch print settings, continuing with limited analysis:", error);
+      }
+    }
+
+    // Fetch filament settings if available
+    if (presets.length > 0 && projectSettings.filament_settings_id?.[0]) {
+      try {
+        const filamentEntry = presets.find((preset: any) => preset.name === projectSettings.filament_settings_id[0]);
+        if (filamentEntry?.sub_path) {
+          const detailResponse = await fetchWithRetry(`${profileRoot}${filamentEntry.sub_path}`);
+          filamentSettingsData = await detailResponse.json();
+        }
+      } catch (error) {
+        console.error("Failed to fetch filament settings, continuing with limited analysis:", error);
+      }
+    }
+
+    // Create a description of the profile for analysis
+    let profileDescription = `Filament Preset: ${projectSettings.filament_settings_id?.[0] || "Unknown"}\n\n`;
+    profileDescription += `Print Process Preset: ${projectSettings.print_settings_id || "Unknown"}\n\n`;
 
     // Add information about modified settings if available
     if (projectSettings.different_settings_to_system) {
-      profileDescription += "The following slicing parameters are further fine-tuned to be different from those in the presets:\n"
+      profileDescription += "The following slicing parameters are further finetuned to be different from those in the presets:\n\n";
 
-      // Ensure we're working with a string before calling split
-      const settingsStr = String(projectSettings.different_settings_to_system);
-      const settings = settingsStr.split(';')
-        .map(s => s.trim())
-        .filter(Boolean);
+      // First, handle the case where we don't have preset data
+      if (!printSettingsData && !filamentSettingsData) {
+        if (typeof projectSettings.different_settings_to_system === 'string') {
+          // Handle string format
+          const settings = projectSettings.different_settings_to_system
+            .split(';')
+            .map((s: string) => s.trim())
+            .filter(Boolean);
 
-      settings.forEach((setting, i) => {
-        profileDescription += `Setting ${i + 1}: ${setting}\n`;
-      });
+          settings.forEach((setting: string) => {
+            profileDescription += `${setting}\n`;
+          });
+        } else if (Array.isArray(projectSettings.different_settings_to_system)) {
+          // Handle array format (both print and filament settings)
+          for (const settingsStr of projectSettings.different_settings_to_system) {
+            if (!settingsStr) continue;
+
+            const settings = settingsStr
+              .split(';')
+              .map((s: string) => s.trim())
+              .filter(Boolean);
+
+            settings.forEach((setting: string) => {
+              profileDescription += `${setting}\n`;
+            });
+          }
+        }
+      } else {
+        // Process print settings differences when we have the preset data
+        if (printSettingsData && projectSettings.different_settings_to_system[0]) {
+          const printSettingKeys = projectSettings.different_settings_to_system[0].split(";").filter(Boolean);
+          printSettingKeys.forEach((key: string) => {
+            const originalValue = printSettingsData[key];
+            const newValue = projectSettings[key];
+            if (originalValue !== undefined && newValue !== undefined) {
+              profileDescription += `${key}: ${originalValue} -> ${newValue}\n`;
+            }
+          });
+        }
+
+        // Process filament settings differences when we have the preset data
+        if (filamentSettingsData && projectSettings.different_settings_to_system[1]) {
+          const filamentSettingKeys = projectSettings.different_settings_to_system[1].split(";").filter(Boolean);
+          filamentSettingKeys.forEach((key: string) => {
+            const originalValue = filamentSettingsData[key];
+            const newValue = projectSettings[key];
+            if (originalValue !== undefined && newValue !== undefined) {
+              profileDescription += `${key}: ${originalValue} -> ${newValue}\n`;
+            }
+          });
+        }
+      }
     }
 
     // Check for API key - fail hard if not found
