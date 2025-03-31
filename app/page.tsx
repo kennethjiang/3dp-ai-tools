@@ -68,6 +68,7 @@ export default function Home() {
   const [comparisonItems, setComparisonItems] = useState<ComparisonItem[]>([])
   const [activeSection, setActiveSection] = useState<string>("overview")
   const [validationError, setValidationError] = useState<string | null>(null)
+  const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Extract settings IDs when project settings change
@@ -318,6 +319,9 @@ export default function Home() {
       return
     }
 
+    // Set analyzing state to true to trigger animation
+    setIsAnalyzing(true)
+
     // Reset all state before starting new analysis
     setIsLoading(true)
     setError(null)
@@ -488,9 +492,9 @@ export default function Home() {
   return (
     <main className="container mx-auto py-10 px-4">
       <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center">
-          <img src="/logo.png" alt="3MF Analyzer Logo" className="w-10 h-10 mr-3" />
-          <h1 className="text-3xl font-bold">How is it sliced?</h1>
+        <div className={`flex items-center transition-all duration-700 ease-in-out transform ${isAnalyzing ? 'translate-x-0 scale-90' : 'translate-x-[calc(50%-2rem)] scale-100'}`}>
+          <img src="/logo.png" alt="3MF Analyzer Logo" className={`w-14 h-14 mr-5 transition-all duration-700 ${isAnalyzing ? 'w-12 h-12' : 'w-14 h-14'}`} />
+          <h1 className={`font-bold transition-all duration-700 ${isAnalyzing ? 'text-3xl' : 'text-5xl'}`}>How is it sliced?</h1>
         </div>
         <a
           href="https://github.com/kennethjiang/ai-3mf-analyzer"
@@ -502,11 +506,11 @@ export default function Home() {
         </a>
       </div>
 
+      <h5 className="font-semibold mb-8">Ever wondered how the original creator of a 3MF file sliced their model? Now you can find out! Just upload the 3MF file and let the AI reveal the secrets.</h5>
+
       <Card className="mb-8">
         <CardHeader>
           <CardDescription>
-            <p>Ever wondered how the original creator of a 3MF file sliced their model? Now you can find out! Just upload the 3MF file and let the AI reveal the secrets.</p>
-            <i>Currently only supports 3MF files created with Bambu Studio or downloaded from MakerWorld. 3MF files created with PrusaSlicer may not work.</i>
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -537,12 +541,14 @@ export default function Home() {
                   <Upload className="h-10 w-10 text-muted-foreground mb-2" />
                   <p className="text-sm font-medium">Drag and drop your 3MF file here</p>
                   <p className="text-xs text-muted-foreground mt-1">or click to browse</p>
-                  <p className="text-xs text-muted-foreground mt-2">Maximum file size: 4.5MB</p>
+                  <p className="text-xs text-muted-foreground mt-4 italic">Currently only supports 3MF files created with Bambu Studio or downloaded from MakerWorld.</p>
+                  <p className="text-xs text-muted-foreground mt-1 italic">3MF files created with PrusaSlicer may not work.</p>
+                  <p className="text-xs text-muted-foreground mt-1 italic">Maximum file size: 4.5MB</p>
                 </div>
               )}
             </div>
 
-            <Button type="submit" disabled={isLoading || !file} className="w-full">
+            <Button type="submit" disabled={isLoading || !file} className="w-full text-lg">
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
