@@ -1,4 +1,6 @@
 import { Langfuse } from 'langfuse'
+import { observeOpenAI } from 'langfuse'
+import OpenAI from 'openai'
 
 // Initialize Langfuse client
 export const langfuse = new Langfuse({
@@ -20,4 +22,22 @@ export const createSpan = (traceId: string, name: string) => {
     traceId,
     name,
   })
+}
+
+// Helper function to create an OpenAI client wrapped with Langfuse
+export const createOpenAIClient = (additionalConfig = {}) => {
+  const apiKey = process.env.OPENAI_API_KEY
+  if (!apiKey) throw new Error("OPENAI_API_KEY environment variable is not set")
+
+  return observeOpenAI(
+    new OpenAI({
+      apiKey,
+      dangerouslyAllowBrowser: true, // Enable browser usage if needed
+    }),
+    {
+      generationName: "3MF-Analysis",
+      tags: ["3mf-analyzer"],
+      ...additionalConfig
+    }
+  )
 }

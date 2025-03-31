@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import OpenAI from "openai"
+import { createOpenAIClient, langfuse } from "@/lib/langfuse"
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,23 +11,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Profile description is required" }, { status: 400 })
     }
 
-    // Get the API key
-    const apiKey = process.env.OPENAI_API_KEY
-
-    if (!apiKey) {
-      return NextResponse.json({ error: "OPENAI_API_KEY is not set" }, { status: 400 })
-    }
-
-    // Log a safe version of the key for debugging
-    const firstFour = apiKey.substring(0, 4)
-    const lastFour = apiKey.substring(apiKey.length - 4)
-    console.log(`Using OpenAI API key: ${firstFour}...${lastFour}`)
-
-    // Create OpenAI client with the dangerouslyAllowBrowser option
-    // This is safe in this context because we're in a server-side API route
-    const openai = new OpenAI({
-      apiKey: apiKey,
-      dangerouslyAllowBrowser: true, // Add this option as suggested in the error message
+    // Create OpenAI client with Langfuse observation
+    const openai = createOpenAIClient({
+      generationName: "API-Route-3MF-Analysis",
+      tags: ["api-route", "fallback-analysis"],
     })
 
     // Call OpenAI API
@@ -73,7 +60,7 @@ export async function POST(request: NextRequest) {
       console.log("OpenAI API response received")
 
       // Extract the content from the response
-      const content = response.choices[0].message.content
+      const content = response.choices[0]?.message?.content || '{}'
       console.log("Content from OpenAI received")
 
       // Parse the JSON response
@@ -97,6 +84,9 @@ export async function POST(request: NextRequest) {
         },
         { status: 200 },
       ) // Return 200 with fallback data instead of error
+    } finally {
+      // Flush any pending events to Langfuse
+      await langfuse.flushAsync()
     }
   } catch (error) {
     // Simple error handling to avoid any property access issues

@@ -1,6 +1,7 @@
 import type { AnalysisResults, ExtractedFile, ConfigFile } from "@/types/analysis"
 import { getStructuredAnalysis } from "./openai"
 import { getBaseUrl } from "./utils"
+import { langfuse } from "./langfuse"
 
 /**
  * Analyzes a 3MF file from its extracted contents
@@ -290,6 +291,9 @@ export async function analyze3mfFile(
         analysisResults.extractedFiles = extractedFiles
         analysisResults.configFiles = configFiles
 
+        // Ensure all Langfuse events are flushed
+        await langfuse.flushAsync()
+
         return analysisResults
       } catch (aiError) {
         console.error("Error with OpenAI analysis:", aiError)
@@ -297,6 +301,9 @@ export async function analyze3mfFile(
         if (aiError instanceof Error && aiError.stack) {
           console.error("Error stack trace:", aiError.stack)
         }
+
+        // Ensure all Langfuse events are flushed even on error
+        await langfuse.flushAsync()
 
         // Return the error directly with more details
         return {
@@ -309,12 +316,20 @@ export async function analyze3mfFile(
       if (error instanceof Error && error.stack) {
         console.error("Error stack trace:", error.stack)
       }
+
+      // Ensure all Langfuse events are flushed
+      await langfuse.flushAsync()
+
       return {
         error: `Failed to analyze file: ${error instanceof Error ? error.message : String(error)}`,
       }
     }
   } catch (error) {
     console.error("Error generating analysis:", error)
+
+    // Ensure all Langfuse events are flushed
+    await langfuse.flushAsync()
+
     return {
       error: `Failed to analyze file: ${error instanceof Error ? error.message : String(error)}`,
     }
