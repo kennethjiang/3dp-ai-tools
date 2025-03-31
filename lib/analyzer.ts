@@ -143,13 +143,18 @@ export async function analyze3mfFile(
     profileDescription += `Print Process Preset: ${projectSettings.print_settings_id}\n\n`
 
     // Add information about modified settings if available
-    if (projectSettings.different_settings_to_system && Array.isArray(projectSettings.different_settings_to_system)) {
+    if (projectSettings.different_settings_to_system) {
       profileDescription += "The following slicing parameters are further fine-tuned to be different from those in the presets:\n"
-      projectSettings.different_settings_to_system.forEach((settingGroup: any, index: any) => {
-        if (typeof settingGroup === "string") {
-          profileDescription += `Group ${index + 1}: ${settingGroup}\n`
-        }
-      })
+
+      // Ensure we're working with a string before calling split
+      const settingsStr = String(projectSettings.different_settings_to_system);
+      const settings = settingsStr.split(';')
+        .map(s => s.trim())
+        .filter(Boolean);
+
+      settings.forEach((setting, i) => {
+        profileDescription += `Setting ${i + 1}: ${setting}\n`;
+      });
     }
 
     // Check for API key - fail hard if not found
