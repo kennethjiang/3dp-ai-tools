@@ -491,16 +491,42 @@ export default function Home() {
 
   return (
     <main className="container mx-auto py-10 px-4">
-      <div className="flex items-center justify-between mb-8">
-        <div className={`flex items-center transition-all duration-700 ease-in-out transform ${isAnalyzing ? 'translate-x-0 scale-90' : 'translate-x-[calc(50%-2rem)] scale-100'}`}>
-          <img src="/logo.png" alt="3MF Analyzer Logo" className={`w-14 h-14 mr-5 transition-all duration-700 ${isAnalyzing ? 'w-12 h-12' : 'w-14 h-14'}`} />
-          <h1 className={`font-bold transition-all duration-700 ${isAnalyzing ? 'text-3xl' : 'text-5xl'}`}>How is it sliced?</h1>
+      <div className="relative mb-8" style={{ height: '5rem' }}>
+        <div
+          className="flex items-center transition-all duration-700 ease-in-out"
+          style={{
+            position: 'absolute',
+            left: isAnalyzing ? '0' : '50%',
+            transform: isAnalyzing
+              ? 'translateX(0) scale(0.9)'
+              : 'translateX(-50%) scale(1)',
+            transformOrigin: 'left center',
+            width: 'fit-content'
+          }}
+        >
+          <img
+            src="/logo.png"
+            alt="3MF Analyzer Logo"
+            className="mr-5 transition-all duration-700"
+            style={{
+              width: isAnalyzing ? '3rem' : '3.5rem',
+              height: isAnalyzing ? '3rem' : '3.5rem'
+            }}
+          />
+          <h1
+            className="font-bold transition-all duration-700"
+            style={{
+              fontSize: isAnalyzing ? '1.875rem' : '3rem'
+            }}
+          >
+            How is it sliced?
+          </h1>
         </div>
         <a
           href="https://github.com/kennethjiang/ai-3mf-analyzer"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center hover:text-primary transition-colors"
+          className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center hover:text-primary transition-colors"
         >
           <Github className="h-6 w-6" />
         </a>
