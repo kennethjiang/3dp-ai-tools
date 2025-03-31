@@ -491,15 +491,16 @@ export default function Home() {
 
   return (
     <main className="container mx-auto py-10 px-4">
-      <div className="relative mb-8" style={{ height: '5rem' }}>
+      <div className="relative mb-8 flex justify-center" style={{ minHeight: '3.5rem' }}>
         <div
           className="flex items-center transition-all duration-700 ease-in-out"
           style={{
             position: 'absolute',
+            top: '50%',
             left: isAnalyzing ? '0' : '50%',
             transform: isAnalyzing
-              ? 'translateX(0) scale(0.9)'
-              : 'translateX(-50%) scale(1)',
+              ? 'translate(0, -50%) scale(0.9)'
+              : 'translate(-50%, -50%) scale(1)',
             transformOrigin: 'left center',
             width: 'fit-content'
           }}
