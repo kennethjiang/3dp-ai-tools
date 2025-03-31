@@ -999,7 +999,7 @@ export default function Home() {
                             </TableBody>
                           </Table>
                         </ScrollArea>
-                        {results.parameterAnalysis.length > 0 && (
+                        {results.parameterAnalysis.length > 0 ? (
                           <div className="mt-6 p-4 bg-muted/30 rounded-lg">
                             <h4 className="font-semibold mb-2 flex items-center">
                               <Info className="h-4 w-4 mr-2" />
@@ -1009,6 +1009,14 @@ export default function Home() {
                               The parameter changes focus on optimizing support structures and bed adhesion, which are
                               critical for successfully printing complex geometries with overhangs.
                             </p>
+                          </div>
+                        ) : (
+                          <div className="p-8 text-center border rounded-md">
+                            <div className="flex justify-center mb-4">
+                              <Info className="h-12 w-12 text-muted-foreground/60" />
+                            </div>
+                            <h3 className="text-lg font-medium mb-2">No Parameter Modifications Detected</h3>
+                            <p className="text-muted-foreground">This profile does not contain any explicit parameter modifications from the base preset.</p>
                           </div>
                         )}
                       </CardContent>

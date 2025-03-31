@@ -20,7 +20,7 @@ const SlicingProfileAnalysis = z.object({
   functional_effects: z.array(z.string()).describe("The expected functional effects of these changes"),
   trade_offs: z.array(z.string()).describe("Potential trade-offs or compromises these settings might introduce"),
   optimization_suggestions: z.array(z.string()).describe("Suggestions for further optimization if applicable"),
-  parameter_effects: z.array(ParameterEffect).describe("Analysis of each parameter modification"),
+  parameter_effects: z.array(ParameterEffect).optional().describe("Analysis of each parameter modification. IMPORTANT: Only include if explicit parameter differences are found in the input. Leave this field out completely if no explicit parameter modifications are specified."),
 })
 
 // Type definitions from the Zod schemas
@@ -57,7 +57,7 @@ async function getStructuredAnalysisFromOpenAI(
         {
           role: "system",
           content:
-            "You are an expert 3D printing consultant specializing in slicing profiles and parameter optimization.",
+            "You are an expert 3D printing consultant specializing in slicing profiles and parameter optimization. IMPORTANT: Only include parameter_effects in your response if the input explicitly contains parameter modifications with original and new values. If no explicit parameter differences are provided, do NOT generate parameter_effects.",
         },
         {
           role: "user",
@@ -121,13 +121,13 @@ export async function getStructuredAnalysis(profileDescription: string): Promise
       functionalEffects: analysis.functional_effects,
       tradeOffs: analysis.trade_offs,
       optimizationSuggestions: analysis.optimization_suggestions,
-      parameterAnalysis: analysis.parameter_effects.map((effect) => ({
+      parameterAnalysis: analysis.parameter_effects ? analysis.parameter_effects.map((effect) => ({
         parameter: effect.parameter,
         originalValue: effect.original_value,
         newValue: effect.new_value,
         purpose: effect.purpose,
         effect: effect.effect,
-      })),
+      })) : [],
       extractedFiles: [],
       configFiles: [],
     }

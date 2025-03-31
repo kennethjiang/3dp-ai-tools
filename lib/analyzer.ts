@@ -221,7 +221,7 @@ export async function analyze3mfFile(
     // Add information about modified settings if available
     if (projectSettings.different_settings_to_system) {
       console.log("Processing different_settings_to_system:", projectSettings.different_settings_to_system);
-      profileDescription += "The following slicing parameters are further finetuned to be different from those in the presets:\n\n";
+      profileDescription += "The following slicing parameters are further fine-tuned to be different from those in the presets:\n\n";
 
       // First, handle the case where we don't have preset data
       if (!printSettingsData && !filamentSettingsData) {
@@ -296,6 +296,8 @@ export async function analyze3mfFile(
           });
         }
       }
+    } else {
+      profileDescription += "No fine-tuned slicing parameters found.\n";
     }
 
     // Check for API key - fail hard if not found
