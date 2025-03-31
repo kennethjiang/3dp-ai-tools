@@ -220,6 +220,7 @@ export async function analyze3mfFile(
 
     // Add information about modified settings if available
     if (projectSettings.different_settings_to_system) {
+      console.log("Processing different_settings_to_system:", projectSettings.different_settings_to_system);
       profileDescription += "The following slicing parameters are further finetuned to be different from those in the presets:\n\n";
 
       // First, handle the case where we don't have preset data
@@ -253,11 +254,22 @@ export async function analyze3mfFile(
         // Process print settings differences when we have the preset data
         if (printSettingsData && projectSettings.different_settings_to_system[0]) {
           const printSettingKeys = projectSettings.different_settings_to_system[0].split(";").filter(Boolean);
+          console.log(`Processing ${printSettingKeys.length} print setting keys:`, printSettingKeys);
           printSettingKeys.forEach((key: string) => {
             const originalValue = printSettingsData[key];
             const newValue = projectSettings[key];
+            // List all settings, even if only one of the values is defined
             if (originalValue !== undefined && newValue !== undefined) {
               profileDescription += `${key}: ${originalValue} -> ${newValue}\n`;
+            } else if (originalValue !== undefined) {
+              // When only original value exists but not in the project settings
+              profileDescription += `${key}: ${originalValue} (removed or reset)\n`;
+            } else if (newValue !== undefined) {
+              // When only project setting exists but not in preset
+              profileDescription += `${key}: (not specified) -> ${newValue}\n`;
+            } else {
+              // Key is in the list but neither preset nor project has the value
+              profileDescription += `${key}: (value not found)\n`;
             }
           });
         }
@@ -268,8 +280,18 @@ export async function analyze3mfFile(
           filamentSettingKeys.forEach((key: string) => {
             const originalValue = filamentSettingsData[key];
             const newValue = projectSettings[key];
+            // List all settings, even if only one of the values is defined
             if (originalValue !== undefined && newValue !== undefined) {
               profileDescription += `${key}: ${originalValue} -> ${newValue}\n`;
+            } else if (originalValue !== undefined) {
+              // When only original value exists but not in the project settings
+              profileDescription += `${key}: ${originalValue} (removed or reset)\n`;
+            } else if (newValue !== undefined) {
+              // When only project setting exists but not in preset
+              profileDescription += `${key}: (not specified) -> ${newValue}\n`;
+            } else {
+              // Key is in the list but neither preset nor project has the value
+              profileDescription += `${key}: (value not found)\n`;
             }
           });
         }
