@@ -135,7 +135,7 @@ export function SettingsComparison({
 
     // Check if different_settings_to_system exists and is an array
     if (!projectSettings.different_settings_to_system || !Array.isArray(projectSettings.different_settings_to_system)) {
-      setError("No different_settings_to_system array found in project settings")
+      console.debug("No different_settings_to_system array found in project settings")
       return
     }
 
