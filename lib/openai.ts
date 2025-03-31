@@ -27,27 +27,6 @@ const SlicingProfileAnalysis = z.object({
 type TParameterEffect = z.infer<typeof ParameterEffect>
 type TSlicingProfileAnalysis = z.infer<typeof SlicingProfileAnalysis>
 
-// Helper function to get the base URL
-function getBaseUrl() {
-  // For server-side rendering
-  if (typeof window === "undefined") {
-    // Check for Vercel environment variables
-    if (process.env.VERCEL_URL) {
-      return `https://${process.env.VERCEL_URL}`
-    }
-    // Local development fallback - always use HTTP for localhost
-    return "http://localhost:3000"
-  }
-
-  // For client-side rendering, use the current window location
-  // but ensure localhost connections use HTTP
-  const origin = window.location.origin
-  if (origin.includes('localhost')) {
-    return origin.replace('https:', 'http:')
-  }
-  return origin
-}
-
 /**
  * Get structured analysis of a 3D printing slicing profile using OpenAI
  */
@@ -130,89 +109,27 @@ async function getStructuredAnalysisFromOpenAI(
 // This function will be called from server components or API routes only
 export async function getStructuredAnalysis(profileDescription: string): Promise<AnalysisResults> {
   try {
-    // Get the base URL for API calls
-    const baseUrl = getBaseUrl()
-    console.log(`Using base URL: ${baseUrl}`)
+    // Get structured analysis directly from OpenAI
+    console.log("Calling OpenAI API directly...")
+    const analysis = await getStructuredAnalysisFromOpenAI(profileDescription)
 
-    try {
-      // Get structured analysis directly from OpenAI
-      console.log("Calling OpenAI API directly...")
-      const analysis = await getStructuredAnalysisFromOpenAI(profileDescription)
-
-      // Convert the API response to our application's AnalysisResults format
-      return {
-        overallPurpose: analysis.overall_purpose,
-        modelType: analysis.model_type,
-        visualEffects: analysis.visual_effects,
-        functionalEffects: analysis.functional_effects,
-        tradeOffs: analysis.trade_offs,
-        optimizationSuggestions: analysis.optimization_suggestions,
-        parameterAnalysis: analysis.parameter_effects.map((effect) => ({
-          parameter: effect.parameter,
-          originalValue: effect.original_value,
-          newValue: effect.new_value,
-          purpose: effect.purpose,
-          effect: effect.effect,
-        })),
-        extractedFiles: [],
-        configFiles: [],
-      }
-    } catch (openaiError) {
-      console.error("Error calling OpenAI directly:", openaiError)
-      console.log("Falling back to analyze-text API endpoint...")
-
-      // Fallback to our API endpoint
-      const response = await fetch(`${baseUrl}/api/analyze-text`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ profileDescription }),
-      })
-
-      // Get the raw text first to inspect it
-      const rawText = await response.text()
-      console.log("Raw API Response:", rawText)
-
-      // Try to parse as JSON
-      let data
-      try {
-        data = JSON.parse(rawText)
-      } catch (parseError) {
-        console.error("Error parsing API response as JSON:", parseError)
-        throw new Error(`API returned invalid JSON: ${rawText.substring(0, 200)}${rawText.length > 200 ? "..." : ""}`)
-      }
-
-      if (!response.ok) {
-        throw new Error(`API request failed: ${response.status} ${rawText}`)
-      }
-
-      // Convert the API response to our application's AnalysisResults format with careful handling of potentially undefined values
-      return {
-        overallPurpose: data?.overall_purpose || "Not available",
-        modelType: data?.model_type || "Not available",
-        visualEffects: Array.isArray(data?.visual_effects) ? data.visual_effects : ["Not available"],
-        functionalEffects: Array.isArray(data?.functional_effects) ? data.functional_effects : ["Not available"],
-        tradeOffs: Array.isArray(data?.trade_offs) ? data.trade_offs : ["Not available"],
-        optimizationSuggestions: Array.isArray(data?.optimization_suggestions)
-          ? data.optimization_suggestions
-          : ["Not available"],
-        parameterAnalysis: Array.isArray(data?.parameter_effects)
-          ? data.parameter_effects.map((effect: any) => ({
-              parameter: effect?.parameter || "Unknown",
-              originalValue: typeof effect?.original_value === 'boolean'
-                ? (effect.original_value ? "1" : "0")
-                : (effect?.original_value != null ? effect.original_value : "N/A"),
-              newValue: typeof effect?.new_value === 'boolean'
-                ? (effect.new_value ? "1" : "0")
-                : (effect?.new_value != null ? effect.new_value : "N/A"),
-              purpose: effect?.purpose || "Not specified",
-              effect: effect?.effect || "Not specified",
-            }))
-          : [],
-        extractedFiles: Array.isArray(data?.extractedFiles) ? data.extractedFiles : [],
-        configFiles: Array.isArray(data?.configFiles) ? data.configFiles : [],
-      }
+    // Convert the API response to our application's AnalysisResults format
+    return {
+      overallPurpose: analysis.overall_purpose,
+      modelType: analysis.model_type,
+      visualEffects: analysis.visual_effects,
+      functionalEffects: analysis.functional_effects,
+      tradeOffs: analysis.trade_offs,
+      optimizationSuggestions: analysis.optimization_suggestions,
+      parameterAnalysis: analysis.parameter_effects.map((effect) => ({
+        parameter: effect.parameter,
+        originalValue: effect.original_value,
+        newValue: effect.new_value,
+        purpose: effect.purpose,
+        effect: effect.effect,
+      })),
+      extractedFiles: [],
+      configFiles: [],
     }
   } catch (error) {
     console.error("Error getting structured analysis:", error)
