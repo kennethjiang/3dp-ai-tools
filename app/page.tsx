@@ -259,6 +259,18 @@ export default function Home() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0]
+
+      // Clear all results, errors and reports when a new file is selected
+      setResults(null)
+      setError(null)
+      setValidationError(null)
+      setSelectedFile(null)
+      setProjectSettings(null)
+      setFilamentSettingsId(null)
+      setPrintSettingsId(null)
+      setComparisonItems([])
+      setIsAnalyzing(false)
+
       // Check file size (20MB limit)
       if (selectedFile.size > 4.5 * 1024 * 1024) {
         setFile(null)
@@ -268,8 +280,6 @@ export default function Home() {
 
       if (selectedFile.name.endsWith(".3mf")) {
         setFile(selectedFile)
-        setError(null)
-        setValidationError(null)
       } else {
         setFile(null)
         setError("Please select a valid .3mf file")
@@ -293,6 +303,18 @@ export default function Home() {
 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const droppedFile = e.dataTransfer.files[0]
+
+      // Clear all results, errors and reports when a new file is selected
+      setResults(null)
+      setError(null)
+      setValidationError(null)
+      setSelectedFile(null)
+      setProjectSettings(null)
+      setFilamentSettingsId(null)
+      setPrintSettingsId(null)
+      setComparisonItems([])
+      setIsAnalyzing(false)
+
       // Check file size (20MB limit)
       if (droppedFile.size > 4.5 * 1024 * 1024) {
         setFile(null)
@@ -302,8 +324,6 @@ export default function Home() {
 
       if (droppedFile.name.endsWith(".3mf")) {
         setFile(droppedFile)
-        setError(null)
-        setValidationError(null)
       } else {
         setFile(null)
         setError("Please select a valid .3mf file")
