@@ -1157,6 +1157,9 @@ export default function Home() {
           </Tabs>
         </>
       )}
+      <footer className="mt-12 text-center text-sm text-muted-foreground">
+        This is an open-source project. Clone it on <a href="https://github.com/kennethjiang/ai-3mf-analyzer" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">GitHub</a>.
+      </footer>
     </main>
   )
 }
