@@ -29,6 +29,8 @@ import {
   Sparkles,
   Cylinder,
   Github,
+  Archive,
+  CircleDot
 } from "lucide-react"
 import type { AnalysisResults, ExtractedFile, ConfigFile } from "@/types/analysis"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -654,7 +656,7 @@ export default function Home() {
                 <span>AI Analysis</span>
               </TabsTrigger>
               <TabsTrigger value="filament" className="flex items-center gap-1">
-                <Cylinder className="h-4 w-4" />
+                <CircleDot className="h-4 w-4" />
                 <span>Filament Preset</span>
               </TabsTrigger>
               <TabsTrigger value="print" className="flex items-center gap-1">
@@ -662,7 +664,7 @@ export default function Home() {
                 <span>Process Preset</span>
               </TabsTrigger>
               <TabsTrigger value="files" className="flex items-center gap-1">
-                <File className="h-4 w-4" />
+                <FileText className="h-4 w-4" />
                 <span>Project Contents</span>
               </TabsTrigger>
             </TabsList>
@@ -738,17 +740,31 @@ export default function Home() {
                         <CardDescription>Summary of the 3MF file analysis</CardDescription>
                       </CardHeader>
                       <CardContent>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <div>
-                            <h3 className="text-lg font-semibold mb-2">Overall Purpose</h3>
-                            <div className="bg-muted/50 p-4 rounded-lg">
-                              <p>{results.overallPurpose}</p>
+                        <div className="mb-6">
+                          <h3 className="text-lg font-semibold mb-2">File Information</h3>
+                          <div className="bg-muted/50 p-4 rounded-lg">
+                            <div className="flex items-center mb-2">
+                              <File className="h-4 w-4 mr-2 text-primary" />
+                              <span className="font-medium">{file?.name}</span>
+                            </div>
+                            <div className="flex items-center">
+                              <Archive className="h-4 w-4 mr-2 text-primary" />
+                              <span>{formatFileSize(file?.size || 0)}</span>
                             </div>
                           </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div>
                             <h3 className="text-lg font-semibold mb-2">Model Type</h3>
                             <div className="bg-muted/50 p-4 rounded-lg">
                               <p>{results.modelType}</p>
+                            </div>
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-semibold mb-2">Overall Purpose</h3>
+                            <div className="bg-muted/50 p-4 rounded-lg">
+                              <p>{results.overallPurpose}</p>
                             </div>
                           </div>
                         </div>
