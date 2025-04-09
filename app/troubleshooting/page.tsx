@@ -8,11 +8,14 @@ import { Card, CardContent, CardHeader, CardDescription } from "@/components/ui/
 import { Loader2, Upload, File } from "lucide-react"
 import { ErrorMessage } from "@/components/error-message"
 import ErrorBoundary from "@/components/error-boundary"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 
 const MAX_FILE_SIZE_MB = 20 // Reverted from 50
 
 export default function TroubleshootingPage() {
   const [file, setFile] = useState<File | null>(null)
+  const [description, setDescription] = useState<string>("")
   const [isDragging, setIsDragging] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
@@ -108,6 +111,9 @@ export default function TroubleshootingPage() {
       // Append the compressed blob with a .gz extension
       formData.append("file", compressedBlob, `${file.name}.gz`)
 
+      // Append the description to the form data
+      formData.append("description", description);
+
       const response = await fetch("/api/troubleshooting", {
         method: "POST",
         body: formData,
@@ -199,7 +205,21 @@ export default function TroubleshootingPage() {
                 )}
               </div>
 
-              <Button type="submit" disabled={isLoading || !file} className="w-full text-lg">
+              <div className="mb-4">
+                <Label htmlFor="problem-description" className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Describe the problem
+                </Label>
+                <Textarea
+                  id="problem-description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="e.g., The first layer didn't stick well... (minimum 3 words)"
+                  rows={4}
+                  className="w-full"
+                />
+              </div>
+
+              <Button type="submit" disabled={isLoading || !file || description.trim().split(/\s+/).filter(Boolean).length < 3} className="w-full text-lg">
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
