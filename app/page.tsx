@@ -513,7 +513,7 @@ export default function Home() {
 
   return (
     <main className="container mx-auto py-10 px-4">
-      <div className="relative mb-8 flex justify-center" style={{ minHeight: '3.5rem' }}>
+      <div className="relative mb-16 flex justify-center" style={{ minHeight: '3.5rem' }}>
         <div
           className="flex items-center transition-all duration-700 ease-in-out"
           style={{
