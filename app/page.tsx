@@ -513,26 +513,9 @@ export default function Home() {
 
   return (
     <main className="container mx-auto py-10 px-4 md:px-10">
-      <div className="relative mb-16 flex justify-center">
-        <div
-          className="flex items-center transition-all duration-700 ease-in-out"
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: isAnalyzing ? '0' : '50%',
-            transform: isAnalyzing
-              ? 'translate(0, -50%) scale(0.9)'
-              : 'translate(-50%, -50%) scale(1)',
-            transformOrigin: 'left center',
-            width: 'fit-content'
-          }}
-        >
-          <h1
-            className="font-bold transition-all duration-700"
-            style={{
-              fontSize: isAnalyzing ? '1.875rem' : '3rem'
-            }}
-          >
+      <div className="mb-8">
+        <div className="flex items-center">
+          <h1 className="font-bold text-3xl">
             How is it sliced?
           </h1>
         </div>

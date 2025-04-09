@@ -128,33 +128,16 @@ export default function TroubleshootingPage() {
 
   return (
     <ErrorBoundary>
-      <main className="container mx-auto py-10 px-4">
-        <div className="relative mb-8 flex justify-center" style={{ minHeight: '3.5rem' }}>
-          <div
-            className="flex items-center transition-all duration-700 ease-in-out"
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: isSubmitting ? '0' : '50%',
-              transform: isSubmitting
-                ? 'translate(0, -50%) scale(0.9)'
-                : 'translate(-50%, -50%) scale(1)',
-              transformOrigin: 'left center',
-              width: 'fit-content'
-            }}
-          >
-            <h1
-              className="font-bold transition-all duration-700"
-              style={{
-                fontSize: isSubmitting ? '1.875rem' : '3rem'
-              }}
-            >
+      <main className="container mx-auto py-10 px-4 md:px-10">
+        <div className="mb-8">
+          <div className="flex items-center">
+            <h1 className="font-bold text-3xl">
               Print Troubleshooting
             </h1>
           </div>
         </div>
 
-        <h5 className="font-semibold mb-8 text-center">Having trouble with a print? Upload the 3MF file, and let the AI help diagnose the potential issues based on the slicer settings.</h5>
+        <h5 className="font-semibold mb-8">Having trouble with a print? Upload the 3MF file, and let the AI help diagnose the potential issues based on the slicer settings.</h5>
 
         <Card className="mb-8">
           <CardHeader>
