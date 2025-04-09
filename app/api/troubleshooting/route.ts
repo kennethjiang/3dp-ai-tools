@@ -6,7 +6,7 @@ import zlib from "zlib"
 export const config = {
   api: {
     bodyParser: {
-      sizeLimit: "55mb", // Set slightly higher than 50MB
+      sizeLimit: "25mb", // Reverted from 55mb
     },
   },
 }
@@ -46,20 +46,24 @@ export async function POST(request: NextRequest) {
     // Convert ArrayBuffer to Buffer
     const compressedBuffer = Buffer.from(compressedArrayBuffer)
 
+    // Log compressed size
+    console.log(`Received compressed file blob: ${originalFilename}, compressed size: ${fileBlob.size} bytes`)
+
     // Decompress the buffer
     const decompressedBuffer = zlib.gunzipSync(compressedBuffer)
 
     // Check the *decompressed* size
-    const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024 // 50 MB
+    const MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024 // Reverted from 50 MB
     if (decompressedBuffer.length > MAX_FILE_SIZE_BYTES) {
-      return NextResponse.json({ error: `Decompressed file size exceeds 50MB limit.` }, { status: 413, headers: corsHeaders }) // Update error message
+      return NextResponse.json({ error: `Decompressed file size exceeds 20MB limit.` }, { status: 413, headers: corsHeaders }) // Revert error message
     }
 
     // Now you have the original file content in `decompressedBuffer`
     // You can convert it to a string, save it, or process it as needed.
     // Example: const fileContentString = decompressedBuffer.toString('utf-8');
 
-    console.log(`Received and decompressed file: ${originalFilename}, original size: ${decompressedBuffer.length} bytes`)
+    // Log decompressed size (already exists, just confirming)
+    console.log(`Decompressed file: ${originalFilename}, original size: ${decompressedBuffer.length} bytes`)
 
     // Return a simple 200 OK response
     return NextResponse.json({ message: "File received and decompressed" }, { status: 200, headers: corsHeaders })
