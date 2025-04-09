@@ -2,11 +2,14 @@
 
 import type React from "react"
 import { useState, useRef } from "react"
+import pako from 'pako'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardDescription } from "@/components/ui/card"
 import { Loader2, Upload, File } from "lucide-react"
 import { ErrorMessage } from "@/components/error-message"
 import ErrorBoundary from "@/components/error-boundary"
+
+const MAX_FILE_SIZE_MB = 20 // Define constant at component scope
 
 export default function TroubleshootingPage() {
   const [file, setFile] = useState<File | null>(null)
@@ -31,7 +34,6 @@ export default function TroubleshootingPage() {
       }
 
       // Basic file size check - adjust as needed
-      const MAX_FILE_SIZE_MB = 10 // Example: 10MB limit
       if (selectedFile.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
         setFile(null)
         setError(`File size exceeds ${MAX_FILE_SIZE_MB}MB limit. Please select a smaller file.`)
@@ -70,7 +72,6 @@ export default function TroubleshootingPage() {
       }
 
       // Basic file size check
-      const MAX_FILE_SIZE_MB = 10
       if (droppedFile.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
         setFile(null)
         setError(`File size exceeds ${MAX_FILE_SIZE_MB}MB limit. Please select a smaller file.`)
@@ -94,8 +95,18 @@ export default function TroubleshootingPage() {
     setError(null)
 
     try {
+      // Read file content
+      const fileContent = await file.arrayBuffer()
+
+      // Compress file content using pako
+      const compressedData = pako.gzip(fileContent)
+
+      // Create a Blob from the compressed data
+      const compressedBlob = new Blob([compressedData])
+
       const formData = new FormData()
-      formData.append("file", file!)
+      // Append the compressed blob with a .gz extension
+      formData.append("file", compressedBlob, `${file.name}.gz`)
 
       const response = await fetch("/api/troubleshooting", {
         method: "POST",
@@ -171,7 +182,7 @@ export default function TroubleshootingPage() {
                     <Upload className="h-10 w-10 text-muted-foreground mb-2" />
                     <p className="text-sm font-medium">Drag and drop your G-Code file here</p>
                     <p className="text-xs text-muted-foreground mt-1">or click to browse</p>
-                    <p className="text-xs text-muted-foreground mt-4 italic">Maximum file size: 10MB</p>
+                    <p className="text-xs text-muted-foreground mt-4 italic">Maximum file size: {MAX_FILE_SIZE_MB}MB</p>
                   </div>
                 )}
               </div>
