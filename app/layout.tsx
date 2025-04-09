@@ -2,12 +2,13 @@ import type React from "react"
 import "./globals.css"
 import { Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
+import Navbar from "@/components/Navbar"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
-  title: "How is it sliced?",
-  description: "Analyze 3MF files for 3D printing optimization",
+  title: "3D Printing AI Tools",
+  description: "AI-powered tools for 3D printing optimization and troubleshooting",
   generator: 'v0.dev',
   icons: {
     icon: [
@@ -36,6 +37,7 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <Navbar />
           {children}
         </ThemeProvider>
       </body>
