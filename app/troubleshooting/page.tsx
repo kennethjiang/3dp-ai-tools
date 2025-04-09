@@ -123,13 +123,23 @@ export default function TroubleshootingPage() {
       if (!response.ok) {
         let errorMessage = `Request failed: ${response.status} ${response.statusText}`
         try {
-          // Try to read the specific error message text from the server response
-          const errorText = await response.text()
-          // Use the server's error text if available, otherwise keep the status-based message
-          errorMessage = errorText || errorMessage
-        } catch (textError) {
-          // Ignore text reading error, fallback to status-based message is already set
-          console.error("Could not read error response text:", textError)
+          // Try to parse the error response as JSON first
+          const errorData = await response.json();
+          if (errorData && errorData.error) {
+            errorMessage = errorData.error; // Use the specific error message from the API
+          } else {
+            // Fallback if JSON parsing worked but no 'error' key
+            errorMessage = JSON.stringify(errorData) || errorMessage;
+          }
+        } catch (jsonError) {
+          // If JSON parsing fails, try reading as text as a last resort
+          try {
+            const errorText = await response.text()
+            errorMessage = errorText || errorMessage // Use text if available
+          } catch (textError) {
+             // Ignore text reading error, fallback to status-based message is already set
+            console.error("Could not read error response text:", textError)
+          }
         }
         throw new Error(errorMessage)
       }
