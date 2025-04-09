@@ -113,11 +113,23 @@ export default function TroubleshootingPage() {
         body: formData,
       })
 
-      const data = await response.json()
-
+      // Check if the response is OK first
       if (!response.ok) {
-        throw new Error(data.error || "Failed to submit file for troubleshooting")
+        let errorMessage = `Request failed: ${response.status} ${response.statusText}`
+        try {
+          // Try to read the specific error message text from the server response
+          const errorText = await response.text()
+          // Use the server's error text if available, otherwise keep the status-based message
+          errorMessage = errorText || errorMessage
+        } catch (textError) {
+          // Ignore text reading error, fallback to status-based message is already set
+          console.error("Could not read error response text:", textError)
+        }
+        throw new Error(errorMessage)
       }
+
+      // Only parse JSON if response is ok
+      const data = await response.json()
 
       console.log("Troubleshooting submission successful:", data)
       // Here you would typically handle the response, e.g., show a success message or results
@@ -206,11 +218,6 @@ export default function TroubleshootingPage() {
             title="Submission Error"
             message={error}
             type="error"
-            suggestions={[
-              "Ensure the uploaded file is a valid .gcode file.",
-              "Check your internet connection.",
-              "If the problem persists, try a different file or contact support.",
-            ]}
           />
         )}
 

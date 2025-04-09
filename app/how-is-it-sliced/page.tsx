@@ -578,39 +578,20 @@ export default function HowIsItSlicedPage() {
         </CardContent>
       </Card>
 
+      {/* Error Display Area */}
       {error && (
         <ErrorMessage
           title="Analysis Error"
           message={error}
           type="error"
-          suggestions={
-            error.includes("File size exceeds 4.5MB limit")
-              ? [] // No suggestions for file size errors
-              : error.includes("API key")
-                ? [
-                    "Make sure you've added your OPENAI_API_KEY to the environment variables",
-                    "Check that your API key is valid and has not expired",
-                    "Verify that your OpenAI account has sufficient credits",
-                  ]
-                : [
-                    "Check your OpenAI API key is valid and has sufficient credits",
-                    "Try again in a few moments as the API might be temporarily unavailable",
-                    "If the error persists, try a different 3MF file",
-                  ]
-          }
         />
       )}
 
       {validationError && (
         <ErrorMessage
-          title="Invalid 3MF File"
+          title="Validation Error"
           message={validationError}
-          type="error"
-          suggestions={[
-            "Make sure you're uploading a 3MF file created with PrusaSlicer or a compatible slicer.",
-            "Check if the file contains project settings (usually in Metadata/project_settings.config).",
-            "Try exporting the 3MF file again from your slicer software with settings included.",
-          ]}
+          type="warning"
         />
       )}
 
