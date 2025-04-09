@@ -3,6 +3,7 @@
 import type React from "react"
 import { useState, useRef } from "react"
 import pako from 'pako'
+import ReactMarkdown from 'react-markdown'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardDescription } from "@/components/ui/card"
 import { Loader2, Upload, File } from "lucide-react"
@@ -19,7 +20,8 @@ export default function TroubleshootingPage() {
   const [isDragging, setIsDragging] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false) // Renamed from isAnalyzing
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+  const [aiGuidance, setAiGuidance] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -146,10 +148,10 @@ export default function TroubleshootingPage() {
 
       // Only parse JSON if response is ok
       const data = await response.json()
-
       console.log("Troubleshooting submission successful:", data)
-      // Here you would typically handle the response, e.g., show a success message or results
-      // For now, we just log it.
+      setAiGuidance(data.ai_guidance || "No guidance received.")
+      // Reset error on success
+      setError(null);
 
     } catch (err) {
       console.error("Troubleshooting submission error:", err)
@@ -251,13 +253,18 @@ export default function TroubleshootingPage() {
           />
         )}
 
-        {isSubmitting && !isLoading && !error && (
+
+        {aiGuidance && !isLoading && (
           <Card className="mt-8">
             <CardHeader>
-              <h2 className="text-xl font-semibold">Troubleshooting Results</h2>
+              <h2 className="text-xl font-semibold">Troubleshooting Guidance</h2>
             </CardHeader>
             <CardContent>
-              <p>Analysis complete. Results will appear here.</p>
+              <div className="prose dark:prose-invert max-w-none">
+                <ReactMarkdown>
+                  {aiGuidance}
+                </ReactMarkdown>
+              </div>
             </CardContent>
           </Card>
         )}
