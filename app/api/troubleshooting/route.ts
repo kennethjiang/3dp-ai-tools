@@ -6,7 +6,7 @@ import zlib from "zlib"
 export const config = {
   api: {
     bodyParser: {
-      sizeLimit: "25mb", // Set a slightly higher limit than the frontend (e.g., 25MB) to account for overhead
+      sizeLimit: "55mb", // Set slightly higher than 50MB
     },
   },
 }
@@ -50,9 +50,9 @@ export async function POST(request: NextRequest) {
     const decompressedBuffer = zlib.gunzipSync(compressedBuffer)
 
     // Check the *decompressed* size
-    const MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024 // 20 MB
+    const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024 // 50 MB
     if (decompressedBuffer.length > MAX_FILE_SIZE_BYTES) {
-      return NextResponse.json({ error: `Decompressed file size exceeds 20MB limit.` }, { status: 413, headers: corsHeaders }) // 413 Payload Too Large
+      return NextResponse.json({ error: `Decompressed file size exceeds 50MB limit.` }, { status: 413, headers: corsHeaders }) // Update error message
     }
 
     // Now you have the original file content in `decompressedBuffer`

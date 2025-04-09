@@ -9,7 +9,7 @@ import { Loader2, Upload, File } from "lucide-react"
 import { ErrorMessage } from "@/components/error-message"
 import ErrorBoundary from "@/components/error-boundary"
 
-const MAX_FILE_SIZE_MB = 20 // Define constant at component scope
+const MAX_FILE_SIZE_MB = 50 // Changed from 20
 
 export default function TroubleshootingPage() {
   const [file, setFile] = useState<File | null>(null)
