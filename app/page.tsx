@@ -527,15 +527,6 @@ export default function Home() {
             width: 'fit-content'
           }}
         >
-          <img
-            src="/logo.png"
-            alt="3MF Analyzer Logo"
-            className="mr-5 transition-all duration-700"
-            style={{
-              width: isAnalyzing ? '3rem' : '3.5rem',
-              height: isAnalyzing ? '3rem' : '3.5rem'
-            }}
-          />
           <h1
             className="font-bold transition-all duration-700"
             style={{
@@ -545,14 +536,6 @@ export default function Home() {
             How is it sliced?
           </h1>
         </div>
-        <a
-          href="https://github.com/kennethjiang/ai-3mf-analyzer"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center hover:text-primary transition-colors"
-        >
-          <Github className="h-6 w-6" />
-        </a>
       </div>
 
       <h5 className="font-semibold mb-8">Ever wondered how the original creator of a 3MF file sliced their model? Now you can find out! Just upload the 3MF file and let the AI reveal the secrets.</h5>
