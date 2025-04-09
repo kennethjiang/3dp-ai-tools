@@ -24,9 +24,9 @@ export default function TroubleshootingPage() {
       setIsSubmitting(false)
 
       // Basic file type check - can be expanded later
-      if (!selectedFile.name.endsWith(".3mf")) {
+      if (!selectedFile.name.endsWith(".gcode")) {
         setFile(null)
-        setError("Please select a valid .3mf file")
+        setError("Please select a valid .gcode file")
         return
       }
 
@@ -63,9 +63,9 @@ export default function TroubleshootingPage() {
       setIsSubmitting(false)
 
       // Basic file type check
-      if (!droppedFile.name.endsWith(".3mf")) {
+      if (!droppedFile.name.endsWith(".gcode")) {
         setFile(null)
-        setError("Please select a valid .3mf file")
+        setError("Please select a valid .gcode file")
         return
       }
 
@@ -137,7 +137,7 @@ export default function TroubleshootingPage() {
           </div>
         </div>
 
-        <h5 className="font-semibold mb-8">Having trouble with a print? Upload the 3MF file, and let the AI help diagnose the potential issues based on the slicer settings.</h5>
+        <h5 className="font-semibold mb-8">Having trouble with a print? Upload the G-Code file, and let the AI help diagnose the potential issues based on the slicer settings.</h5>
 
         <Card className="mb-8">
           <CardHeader>
@@ -158,7 +158,7 @@ export default function TroubleshootingPage() {
                 onDrop={handleDrop}
                 onClick={triggerFileInput}
               >
-                <input type="file" ref={fileInputRef} onChange={handleFileChange} accept=".3mf" className="hidden" />
+                <input type="file" ref={fileInputRef} onChange={handleFileChange} accept=".gcode" className="hidden" />
 
                 {file ? (
                   <div className="flex flex-col items-center">
@@ -169,7 +169,7 @@ export default function TroubleshootingPage() {
                 ) : (
                   <div className="flex flex-col items-center">
                     <Upload className="h-10 w-10 text-muted-foreground mb-2" />
-                    <p className="text-sm font-medium">Drag and drop your 3MF file here</p>
+                    <p className="text-sm font-medium">Drag and drop your G-Code file here</p>
                     <p className="text-xs text-muted-foreground mt-1">or click to browse</p>
                     <p className="text-xs text-muted-foreground mt-4 italic">Maximum file size: 10MB</p>
                   </div>
@@ -196,7 +196,7 @@ export default function TroubleshootingPage() {
             message={error}
             type="error"
             suggestions={[
-              "Ensure the uploaded file is a valid .3mf file.",
+              "Ensure the uploaded file is a valid .gcode file.",
               "Check your internet connection.",
               "If the problem persists, try a different file or contact support.",
             ]}
