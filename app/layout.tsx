@@ -38,7 +38,9 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <Navbar />
-          {children}
+          <main className="container mx-auto py-4 px-4">
+            {children}
+          </main>
         </ThemeProvider>
       </body>
     </html>
