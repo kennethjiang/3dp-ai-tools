@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"; // Import Button
 
 // Define navigation items with name and href
 const navItems = [
-  { name: "How is it sliced?", href: "/" },
+  { name: "How is it sliced?", href: "/how-is-it-sliced" },
   { name: "Print troubleshooting", href: "/troubleshooting" },
 ];
 
