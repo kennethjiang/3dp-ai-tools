@@ -180,6 +180,24 @@ export default function TroubleshootingPage() {
 
         <h5 className="font-semibold mb-8">Having trouble with a print? Upload the G-Code file, and let the AI help diagnose the potential issues based on the slicer settings.</h5>
 
+        <div className="mb-8 p-4 bg-green-100 border-l-4 border-green-500 text-green-800 dark:bg-green-900/30 dark:border-green-600 dark:text-green-200 rounded-r-md">
+          <div className="flex items-center">
+            {/* Using a simple lightbulb character as an SVG is complex here */}
+            <span className="text-lg mr-2">💡</span>
+            <strong className="font-semibold">TIP</strong>
+          </div>
+          <p className="mt-2 text-sm">
+            <a
+              href="https://github.com/kennethjiang/JusPrin/releases/latest"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 dark:text-blue-400 underline hover:text-blue-800 dark:hover:text-blue-300"
+            >
+              Download JusPrin
+            </a> for a fully-guided troubleshooting experience.
+          </p>
+        </div>
+
         <Card className="mb-8">
           <CardHeader>
             <CardDescription></CardDescription>
