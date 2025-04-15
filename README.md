@@ -1,8 +1,12 @@
-# AI 3MF Analyzer
+# 3D Printing AI Tools
 
-A Next.js web application that analyzes 3D printing files (3MF format) using AI to provide insights about slicer settings and their effects on print quality.
+A collection of Next.js web applications that use AI to provide insights and assistance for 3D printing.
 
-## Features
+## Available Tools
+
+### 1. How Is It Sliced?
+
+Analyzes 3D printing files (3MF format) to provide insights about slicer settings and their effects on print quality.
 
 - Upload and analyze 3MF files from PrusaSlicer and compatible slicers (up to 4.5MB)
 - Extract and view all files contained within the 3MF archive
@@ -14,7 +18,19 @@ A Next.js web application that analyzes 3D printing files (3MF format) using AI 
   - Trade-offs introduced by the settings
   - Optimization suggestions
   - Detailed parameter-by-parameter analysis
-- Langfuse integration for tracking and monitoring OpenAI API calls
+
+### 2. Print Troubleshooting
+
+Diagnoses potential issues with 3D prints based on G-code files and problem descriptions.
+
+- Upload G-code files (up to 20MB) from slicers like OrcaSlicer
+- Provide a description of the print issue you're experiencing
+- AI analyzes the slicing parameters extracted from the G-code
+- Get personalized troubleshooting guidance including:
+  - Possible causes of the print issue
+  - Likelihood of each cause based on your slicing parameters
+  - Specific suggestions for resolving the issues
+  - Explanations based on your particular settings
 
 ## Technology Stack
 
@@ -39,8 +55,8 @@ A Next.js web application that analyzes 3D printing files (3MF format) using AI 
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/ai-3mf-analyzer.git
-   cd ai-3mf-analyzer
+   git clone https://github.com/your-username/3dp-ai-tools.git
+   cd 3dp-ai-tools
    ```
 
 2. Install dependencies:
@@ -96,13 +112,28 @@ A Next.js web application that analyzes 3D printing files (3MF format) using AI 
 ## Usage
 
 1. Open the application in your web browser.
-2. Upload a 3MF file using the drag-and-drop area or the file browser (max 4.5MB).
-3. Wait for the analysis to complete.
-4. Explore the results across different tabs:
-   - Overview: General information about the print settings
-   - Files: View all files contained in the 3MF archive
-   - Settings: Analyze modified slicer settings
-   - Comparison: Compare against standard profiles
+2. Choose the tool you want to use from the navigation.
+3. For "How Is It Sliced?":
+   - Upload a 3MF file using the drag-and-drop area or the file browser (max 4.5MB).
+   - Wait for the analysis to complete.
+   - Explore the results across different tabs:
+     - Overview: General information about the print settings
+     - Files: View all files contained in the 3MF archive
+     - Settings: Analyze modified slicer settings
+     - Comparison: Compare against standard profiles
+4. For "Print Troubleshooting":
+   - Upload a G-code file using the drag-and-drop area or file browser (max 20MB).
+   - Describe the print issue you're experiencing in the text area.
+   - Submit your information and wait for the AI analysis.
+   - Review the troubleshooting guidance provided.
+
+## Future Tools
+
+This project aims to expand with additional AI-powered tools for 3D printing. Future tools may include:
+- Model optimization suggestions
+- Material compatibility checker
+- Print time and cost estimator
+- Automatic profile tuning
 
 ## Development Notes
 
@@ -111,7 +142,7 @@ A Next.js web application that analyzes 3D printing files (3MF format) using AI 
 - Error handling is implemented for various failure scenarios
 - For local development without an OpenAI API key, you can use the test endpoint at `/test-openai`
 - API calls are tracked using Langfuse when configured (optional)
-- File upload size is limited to 4.5MB to comply with Vercel's free tier limits
+- File upload size is limited to 4.5MB for 3MF files and 20MB for G-code files
 
 ## License
 
