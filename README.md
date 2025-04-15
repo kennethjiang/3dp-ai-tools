@@ -1,5 +1,9 @@
 # 3D Printing AI Tools
 
+This repository is an open playground and inspiration hub for developers, makers, and enthusiasts at the intersection of artificial intelligence and 3D printing. Its primary purpose is to showcase what's possible when combining modern AI capabilities with 3D printing workflows, and to inspire others to create their own innovative tools in this exciting space.
+
+We invite you to explore, contribute, fork, and build upon these examples to create new tools that push the boundaries of what's possible in 3D printing. Whether you're a developer looking to learn about AI integration or a 3D printing enthusiast curious about how AI can improve your workflow, this project provides a foundation you can build upon.
+
 A collection of Next.js web applications that use AI to provide insights and assistance for 3D printing.
 
 ## Available Tools
